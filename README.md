@@ -4,7 +4,8 @@
 
 Connect with me: https://www.reddit.com/r/Morphological/ | https://x.com/Phovso | https://app.gitter.im/#/room/#msc:gitter.im
 
-<a href="https://github.com/Phovos/msc">MSC: Morphological Source Code</a> © 2025 by <a href="https://github.com/Phovos">Phovos</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;">; or see /LICENSE for a copy.
+<a href="https://github.com/Phovos/MSC">MSC: Morphological Source Code</a> © 2025 by <a href="https://github.com/Phovos">Phovos</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;">
+; or see /LICENSE for a copy.
 
 
 # Morphological Source Code: The Quantum Bridge to Data-Oriented Design
