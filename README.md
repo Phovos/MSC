@@ -1,14 +1,10 @@
-# MSC
+Connect with me elsewhere: <a href="https://www.reddit.com/r/Morphological/">r/Morphological subreddit</a>|<a href="https://x.com/Phovso">Phovos(Phovso) on X</a>|<a href="https://app.gitter.im/#/room/#msc:gitter.im">Morphological Source Code gitter chatroom</a>
 
-Welcome to the Morphological Source Code repo, this is the top-level [README.md]!
+Welcome to the Morphological Source Code repo! This is the top-level ![README.md](/README.md).
 
-Connect with me: https://www.reddit.com/r/Morphological/ | https://x.com/Phovso | https://app.gitter.im/#/room/#msc:gitter.im
+<a href="https://github.com/Phovos/MSC">MSC: Morphological Source Code</a> © 2025 by <a href="https://github.com/Phovos">Phovos</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; or see ![LICENSE](/LICENSE) for a copy. <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;">
 
-<a href="https://github.com/Phovos/MSC">MSC: Morphological Source Code</a> © 2025 by <a href="https://github.com/Phovos">Phovos</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;">
-
-; or see [/LICENSE] for a copy.
-
-# Morphological Source Code: The Quantum Bridge to Data-Oriented Design
+# Morphological Source Code (MSC): The Quantum Bridge to Data-Oriented Design
 
 In modern computational paradigms, we face an ongoing challenge: how do we efficiently represent, manipulate, and reason about data in a way that can bridge the gap between abstract mathematical models and real-world applications? The concept of Morphological Source Code (MSC) offers a radical solution—by fusing semantic data embeddings, Hilbert space representation, and non-relativistic, morphological reasoning into a compact and scalable system. This vision draws from a wide range of computational models, including quantum mechanics, data-oriented design (DOD), and human cognitive architectures, to create a system capable of scaling from fundamental computational elements all the way to self-replicating cognitive systems.
 
