@@ -1,8 +1,8 @@
-Connect with me elsewhere: <a href="https://www.reddit.com/r/Morphological/">r/Morphological subreddit</a>|<a href="https://x.com/Phovso">Phovos(Phovso) on X</a>|<a href="https://app.gitter.im/#/room/#msc:gitter.im">Morphological Source Code gitter chatroom</a>
+<h3><a href="https://github.com/Phovos/MSC">MSC: Morphological Source Code</a> © 2025 by <a href="https://github.com/Phovos">Phovos</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"></h3>
 
 Welcome to the Morphological Source Code repo! This is the top-level ![README.md](/README.md).
 
-<a href="https://github.com/Phovos/MSC">MSC: Morphological Source Code</a> © 2025 by <a href="https://github.com/Phovos">Phovos</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; or see ![LICENSE](/LICENSE) for a copy. <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;">
+Connect with me elsewhere: <a href="https://www.reddit.com/r/Morphological/">r/Morphological subreddit</a>|<a href="https://x.com/Phovso">Phovos(Phovso) on X</a>|<a href="https://app.gitter.im/#/room/#msc:gitter.im">Morphological Source Code gitter</a>
 
 # Morphological Source Code (MSC): The Quantum Bridge to Data-Oriented Design
 
