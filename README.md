@@ -1,10 +1,21 @@
-<h3><a href="https://github.com/Phovos/MSC">MSC: Morphological Source Code</a> © 2025 by <a href="https://github.com/Phovos">Phovos</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"></h3>
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![Python 3.12+](https://img.shields.io/badge/Python-3.12+-3776AB.svg?logo=python)](https://www.python.org)
+[![Status: Experimental](https://img.shields.io/badge/Status-Experimental-red.svg)](https://github.com/Phovos/MSC)
 
-Welcome to the Morphological Source Code repo! This is the top-level ![README.md](/README.md).
+[cc-by]: http://creativecommons.org/licenses/by/4.0/
+[cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
 
-Connect with me elsewhere: <a href="https://www.reddit.com/r/Morphological/">r/Morphological subreddit</a>|<a href="https://x.com/Phovso">Phovos(Phovso) on X</a>|<a href="https://app.gitter.im/#/room/#msc:gitter.im">Morphological Source Code gitter</a>
+**Welcome to the Morphological Source Code (MSC) repository!**
 
-# Morphological Source Code (MSC): The Quantum Bridge to Data-Oriented Design
+This is the top-level ![README.md](/README.md).
+
+Me&MSC online: <a href="https://www.reddit.com/r/Morphological/">r/Morphological</a>|<a href="https://x.com/Phovso">Phovos(Phovso)@X</a>|<a href="https://www.youtube.com/@phovos">Phovos@youtube</a>|<a href="https://app.gitter.im/#/room/#msc:gitter.im">MSC gitter(dev-chat)</a>
+
+© 2025 by [Phovos](https://github.com/Phovos). Licensed under [Creative Commons Attribution 4.0 International][cc-by].
+
+# Morphological Source Code (MSC):
+
+    The Quantum Bridge to Data-Oriented Design
 
 In modern computational paradigms, we face an ongoing challenge: how do we efficiently represent, manipulate, and reason about data in a way that can bridge the gap between abstract mathematical models and real-world applications? The concept of Morphological Source Code (MSC) offers a radical solution—by fusing semantic data embeddings, Hilbert space representation, and non-relativistic, morphological reasoning into a compact and scalable system. This vision draws from a wide range of computational models, including quantum mechanics, data-oriented design (DOD), and human cognitive architectures, to create a system capable of scaling from fundamental computational elements all the way to self-replicating cognitive systems.
 
