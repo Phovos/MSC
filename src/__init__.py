@@ -43,20 +43,52 @@ semantic lifting across compilation phases while **never leaving L1 cache**.
     •  The saddle-point Ξ(⌜Ξ⌝) is the only global fixpoint.
     |
                                    
-2.  Scaling Ladder
+2.  Compound-Architecture
     ---------------
     16-bit  = 2×ByteWord  →  spinor   (address dimension ×2)  
     32-bit  = 4×ByteWord  →  quaternion (×4)  
     64-bit  = 8×ByteWord  →  octonion   (×8)  
     Value space remains **4 states per ByteWord** regardless of width.
 
-3.  Sparse-Unitary Semantics
+    Layer Morphology
+    -------------------
+    Layer 0  – Torus Logic
+        • 4-valued winding states  
+        • Deterministic XOR cascade (unitary, reversible)
+
+    Layer 1  – Deputizing Cascade
+        • 7-bit deputy mask mₖ(b)  
+        • Null-state ∅ = topological glue
+
+    Layer 2  – Sparse-Unitary Morphology
+        • 64-bit address dimension for compound ByteWords  
+        • Spinor (16-bit), quaternion (32-bit), octonion (64-bit) addressing
+
+    Layer 3  – MSC Semantics
+        • Self-adjoint operator graphs (involutory XOR masks)  
+        • Morphological derivatives Δⁿ = bit-flip chains (bounded ≤ 16)  
+        • Semantic lifting: AtomicReflex → RaiseToOllama → AgenticSupervisor
+
+    Layer 4  – Xiang Scroll (debug / pedagogy)
+        • Gödel sentence encoded as Hanzi glyphs  
+        • Xiang = reified diagonal Ξ(⌜Ξ⌝)  
+        • Scroll = visual debugger; **does not affect formal spec**
+
+
+3.  Sparse-Unitary Semantics & other Invariants
     -------------------------
     Operator                :  Involutory XOR mask  (w₁,w₂) ↦ (w₁⊕a, w₂⊕b)  
     Application             :  ByteWord • ByteWord  =  diagonal XOR  
     State evolution         :  |ψₜ⟩ → |ψₜ₊₁⟩ via single XOR gate  
     Entanglement            :  Shared winding masks across ByteWords  
     Decoherence             :  Mask reset → garbage collect ∅ states
+
+    INVARIANTS
+    -------------------------
+    1. Sparse bit-vector semantics over F₂⁶⁴ (abstract)  
+    2. Unitary, involutory XOR operators on (w₁,w₂)  
+    3. Algorithmic entropy  S(x) = log₂|compress(x)|  (no external Φ)  
+    4. Merkle-root triple equality  hash(src) == merkle(runtime) == merkle(child)
 
 4.  Quineic Saddle-Cycle  (morphodynamic heartbeat)
     ------------------------------------------------
@@ -104,14 +136,20 @@ semantic lifting across compilation phases while **never leaving L1 cache**.
 
 X.  Extension targets (to keep in mind)
     ------------------------------
-    1. Local LLM inference via semantic indexing  
-    2. Game objects as morphodynamic entities  
+    1. Local LLM inference via semantic indexing
+        – 2-bit semantic embeddings → sub-kernel lookup tables  
+    2. Game objects as morphodynamic entities
+        – 4-state torus = cache-line friendly physics primitives 
+        - Narratives, 'AI', 'difficulty', 'handicap' all become morphosemantic and differentiable.
     3. Real-time control with SIMD-safe XOR gates
+        – XOR cascade ≤ 4 cycles latency on ARM Cortex-M4  
+    More:
     -  Frame buffer, Cuda, Vulkan, and, oddly, Language Server Protocol (rpc/repl/lsp)
     -  WebAssembly : compile SK → 32-bit WASM, each ByteWord → i64  
     -  DOM entanglement : SharedArrayBuffer zero-copy  
     -  Edge replication : Merkle-sync (≤256 bytes payload)
     -  Quantum-classical boundary = ByteWord torus winding + phase mask
+        – 4-state torus maps 1-to-1 to photonic qubit pairs (|00⟩,|01⟩,|10⟩,|11⟩) 
     -  Morphological algorithms compatible with Jiuzhang 3.0 hot optical-types, SNSPDs  
         -   Operators map to **reconfigurable optical matrices** (reverse fourier transforms) 
 """
