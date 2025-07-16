@@ -153,3 +153,182 @@ X.  Extension targets (to keep in mind)
     -  Morphological algorithms compatible with Jiuzhang 3.0 hot optical-types, SNSPDs  
         -   Operators map to **reconfigurable optical matrices** (reverse fourier transforms) 
 """
+# V2 Core Library: Morphologic Runtime and Ontology
+
+import enum
+import time
+import random
+import sys
+import hashlib
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from typing import Any, List, Optional, Type, TypeVar, Union, Callable, Protocol, runtime_checkable
+from functools import wraps
+
+T = TypeVar('T')
+V = TypeVar('V')
+C = TypeVar('C')
+
+# --- Core Numeric Type ---
+
+class MorphicComplex:
+    """Complex number with morphic properties."""
+    def __init__(self, real: float, imag: float):
+        self.real = real
+        self.imag = imag
+    
+    def conjugate(self) -> 'MorphicComplex':
+        return MorphicComplex(self.real, -self.imag)
+    
+    def __add__(self, other: 'MorphicComplex') -> 'MorphicComplex':
+        return MorphicComplex(self.real + other.real, self.imag + other.imag)
+    
+    def __mul__(self, other: 'MorphicComplex') -> 'MorphicComplex':
+        return MorphicComplex(
+            self.real*other.real - self.imag*other.imag,
+            self.real*other.imag + self.imag*other.real
+        )
+    
+    def __repr__(self) -> str:
+        if self.imag == 0:
+            return f"{self.real}"
+        sign = "+" if self.imag >= 0 else ""
+        return f"{self.real}{sign}{self.imag}j"
+
+# --- Morphic Enums ---
+
+class Morphology(enum.IntEnum):
+    MORPHIC = 0
+    DYNAMIC = 1
+    MARKOVIAN = -1
+    NON_MARKOVIAN = 1  # placeholder for sqrt(-1j)
+
+class QState(enum.Enum):
+    SUPERPOSITION = 1
+    ENTANGLED    = 2
+    COLLAPSED    = 4
+    DECOHERENT   = 8
+
+class QuantumCoherenceState(enum.Enum):
+    SUPERPOSITION = "superposition"
+    ENTANGLED     = "entangled"
+    COLLAPSED     = "collapsed"
+    DECOHERENT    = "decoherent"
+    EIGENSTATE    = "eigenstate"
+
+class EntanglementType(enum.Enum):
+    CODE_LINEAGE     = "code_lineage"
+    TEMPORAL_SYNC    = "temporal_sync"
+    SEMANTIC_BRIDGE  = "semantic_bridge"
+    PROBABILITY_FIELD = "probability_field"
+
+# --- Morphological Rule ---
+
+class MorphologicalRule:
+    def __init__(self, symmetry: str, conservation: str, lhs: str, rhs: List[str]):
+        self.symmetry = symmetry
+        self.conservation = conservation
+        self.lhs = lhs
+        self.rhs = rhs
+    
+    def apply(self, seq: List[str]) -> List[str]:
+        if self.lhs in seq:
+            idx = seq.index(self.lhs)
+            return seq[:idx] + self.rhs + seq[idx+1:]
+        return seq
+
+# --- MorphologicPyOb ---
+
+@dataclass
+class MorphologicPyOb:
+    symmetry: str
+    conservation: str
+    lhs: str
+    rhs: List[str]
+    value: Any
+    ttl: Optional[int] = None
+    state: QState = QState.SUPERPOSITION
+    
+    def __post_init__(self):
+        self._birth = time.time()
+        self._state = self.state
+        self._ref = 1
+        if self.state == QState.SUPERPOSITION:
+            self._super = [self.value]
+        else:
+            self._super = []
+        if self.state == QState.ENTANGLED:
+            self._ent = [self.value]
+        else:
+            self._ent = []
+    
+    def apply_transformation(self, seq: List[str]) -> List[str]:
+        out = seq
+        if self.lhs in seq:
+            idx = seq.index(self.lhs)
+            out = seq[:idx] + self.rhs + seq[idx+1:]
+            self._state = QState.ENTANGLED
+        return out
+    
+    def collapse(self) -> Any:
+        if self._state != QState.COLLAPSED:
+            if self._state == QState.SUPERPOSITION and self._super:
+                self.value = random.choice(self._super)
+            self._state = QState.COLLAPSED
+        return self.value
+
+# --- ByteWord Representation ---
+
+class ByteWord:
+    def __init__(self, raw: int):
+        if not 0 <= raw <= 0xFF:
+            raise ValueError("ByteWord must be 0-255")
+        self.raw = raw
+        self.state = (raw >> 4) & 0x0F
+        self.morphism = (raw >> 1) & 0x07
+        self.floor = Morphology(raw & 0x01)
+    
+    def __repr__(self):
+        return f"ByteWord(state={self.state}, morph={self.morphism}, floor={self.floor})"
+
+# --- CPythonFrame for Runtime Tracking ---
+
+@dataclass
+class CPythonFrame:
+    type_ptr: int
+    obj_type: Type[Any]
+    value: Any
+    refcount: int = field(default=1)
+    ttl: Optional[int] = None
+    state: QState = field(init=False, default=QState.SUPERPOSITION)
+    
+    def __post_init__(self):
+        self._birth = time.time()
+        if self.ttl:
+            self._expiry = self._birth + self.ttl
+        else:
+            self._expiry = None
+    
+    @classmethod
+    def from_object(cls, obj: Any) -> 'CPythonFrame':
+        return cls(
+            type_ptr=id(type(obj)),
+            obj_type=type(obj),
+            value=obj,
+            refcount=sys.getrefcount(obj)-1
+        )
+    
+    def collapse(self) -> Any:
+        self.state = QState.COLLAPSED
+        return self.value
+
+# Test instantiation
+if __name__ == "__main__":
+    mc = MorphicComplex(1, 2)
+    print(mc, mc.conjugate(), mc*mc)
+    bw = ByteWord(0b10110010)
+    print(bw)
+    mp = MorphologicPyOb("sym", "cons", "A", ["B","C"], 42)
+    print(mp.apply_transformation(["X","A","Y"]))
+    cf = CPythonFrame.from_object([1,2,3])
+    print(cf, cf.collapse())
