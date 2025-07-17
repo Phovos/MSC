@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 (MSC) Morphological Source Code Framework – V0.0.1
 ================================================================================
@@ -160,16 +161,39 @@ import time
 import random
 import sys
 import hashlib
+import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, List, Optional, Type, TypeVar, Union, Callable, Protocol, runtime_checkable
+from typing import Any, List, Optional, Type, TypeVar, Dict, Set, Callable, Protocol, runtime_checkable
 from functools import wraps
 
 T = TypeVar('T')
 V = TypeVar('V')
 C = TypeVar('C')
 
-# --- Core Numeric Type ---
+MSC_REGISTRY: Dict[str, Set[str]] = {'classes': set(), 'functions': set()}
+
+@dataclass
+class MorphSpec:
+    """Blueprint for morphological classes."""
+    entropy: float
+    trigger_threshold: float
+    memory: dict
+    signature: str
+
+def morphology(source_model: Type) -> Callable[[Type], Type]:
+    """Decorator: register & validate a class against a MorphSpec."""
+    def decorator(target: Type) -> Type:
+        target.__msc_source__ = source_model
+        # cls.__msc_source__ = spec
+        # Ensure target has all annotated fields from source_model
+        for field_name in getattr(source_model, '__annotations__', {}):
+            if field_name not in getattr(target, '__annotations__', {}):
+                raise TypeError(f"{target.__name__} missing field '{field_name}'")
+        MSC_REGISTRY['classes'].add(target.__name__)
+        return target
+        # return cls 
+    return decorator
 
 class MorphicComplex:
     """Complex number with morphic properties."""
@@ -195,7 +219,18 @@ class MorphicComplex:
         sign = "+" if self.imag >= 0 else ""
         return f"{self.real}{sign}{self.imag}j"
 
-# --- Morphic Enums ---
+class MorphologicalRule:
+    def __init__(self, symmetry: str, conservation: str, lhs: str, rhs: List[str]):
+        self.symmetry = symmetry
+        self.conservation = conservation
+        self.lhs = lhs
+        self.rhs = rhs
+    
+    def apply(self, seq: List[str]) -> List[str]:
+        if self.lhs in seq:
+            idx = seq.index(self.lhs)
+            return seq[:idx] + self.rhs + seq[idx+1:]
+        return seq
 
 class Morphology(enum.IntEnum):
     MORPHIC = 0
@@ -222,20 +257,13 @@ class EntanglementType(enum.Enum):
     SEMANTIC_BRIDGE  = "semantic_bridge"
     PROBABILITY_FIELD = "probability_field"
 
-# --- Morphological Rule ---
-
-class MorphologicalRule:
-    def __init__(self, symmetry: str, conservation: str, lhs: str, rhs: List[str]):
-        self.symmetry = symmetry
-        self.conservation = conservation
-        self.lhs = lhs
-        self.rhs = rhs
-    
-    def apply(self, seq: List[str]) -> List[str]:
-        if self.lhs in seq:
-            idx = seq.index(self.lhs)
-            return seq[:idx] + self.rhs + seq[idx+1:]
-        return seq
+def elevate(data: Any, cls: Type) -> object:
+    """Raise a dict or object to a registered morphological class."""
+    if not hasattr(cls, '__msc_source__'):
+        raise TypeError(f"{cls.__name__} is not a morphological class.")
+    source = cls.__msc_source__
+    kwargs = {k: getattr(data, k, data.get(k)) for k in source.__annotations__}
+    return cls(**kwargs)
 
 # --- MorphologicPyOb ---
 
