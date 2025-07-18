@@ -1,48 +1,70 @@
 from __future__ import annotations
 """
-(MSC) Morphological Source Code Framework – V0.0.1
+(MSC) Morphological Source Code Framework – V0.0.11
 ================================================================================
-MSC SDK | (Sparse-Unitary) Homoiconic Runtime | 4-State Church-Turing Torus
+<https://github.com/Phovos/msc> • MSC: Morphological Source Code © 2025 by Phovos
 --------------------------------------------------------------------------------
-<a href="https://github.com/Phovos/msc">MSC: Morphological Source Code</a> © 2025 by <a href="https://github.com/Phovos">Phovos</a> 
 
-MSC implements *quantum-coherent* computational morphogenesis through tripartite
+MSC implements *quantum-coherent computational morphogenesis* through tripartite
 T/V/C ontological typing and Quineic Statistical Dynamics (QSD) field operators.
-Runtime entities exist as **sparse bit-vectors over F₂** (one bit per redex)
+Runtime entities exist as **sparse bit-vectors over F₂** (one bit per redex),
 acted upon by **self-adjoint XOR-popcount operators**, enabling non-Markovian
-semantic lifting across compilation phases while **never leaving L1 cache**.
+semantic lifting across compilation phases—**while never leaving L1 cache**.
 
 0.  Physical Atom : ByteWord (8-bit)
+-----------------------------------
     ┌---┬---┬---┬---┬---┬---┬---┬---┐
     │ C │ V │ V │ V │ T │ T │ T │ T │   ← raw octet
     └---┴---┴---┴---┴---┴---┴---┴---┘
-    C  – Captain / thermodynamic MSB
-    V  – Value field (3 bits, deputizable)
-    T  – Type field (4 bits, arity & winding)
+    'C, V, and T' are binary (0/1) fields interpreted *lazily* by observation.
+
+    • C — Captain / Thermodynamic MSB
+        - `C=1`: active (radiative); `C=0`: dormant (absorptive).
+        - Acts as a *pilot-wave* guiding the morphogenetic behavior of the ByteWord.
+        - No `V` or `T` structure is meaningful until `C` has been "absorbed".
+          Models include raycasting and Brownian motion in idealized gas.
+    
+    • V — Value Field (3 bits, deputizable)
+        - Supports **deputization cascades**, recursively promoting the next V
+          into the MSB role if `C=0`.
+        - This continues until a null-state is reached.
+    
+    • T — Type Field (4 bits; winding + arity)
+        - Encodes toroidal winding pair (w₁, w₂) ∈ ℤ₂×ℤ₂.
+        - Governs directional traversal in ByteWord-space.
+        - Also encodes arity and semantic lifting phase.
 
 1.  Physical Layout
-    ----------------
-    ByteWord (8 bits)           :  `< C V V V | T T T T >`
-    MSB (C)                     :  Captain bit – active=1, dormant=0, aka '[thermodynamic] Character'
-        or, 'pointable', meaning it can point outwards, if extensive in character, not intensive.
-    V-bits                      :  Deputy mask for **deputizing cascade**  
-    T-bits                      :  Torus winding pair (w₁,w₂) → 4 valued states  
-    NULL (all T=0 & C=0)        :  ∅ — topological glue.
-    Deputizing Cascade:
-    | When C=0, the next V becomes the *new* MSB; recursion proceeds until
-    all bits are exhausted → **null-state ∅**  
-    Deputizing Mask (side-band) :  k counts the *effective* MSB after each
-                                   zero-Captain collapse; 0 ≤ k ≤ 6.  
-                                   Mask bits are **metadata only**; payload
-                                   bits never altered.
+-------------------
+    • NULL (C=0, T=0): identity glue — no semantic content, only topological.
+    • NULL-flavored states (C=0, T=0, V>0): inert deputies.
+    • Deputizing cascade: 
+        - When C=0, next `V` is promoted.
+        - Recurse until all bits are exhausted → ∅ (null-state).
 
-    •  ByteWord is a **genus-2 torus** encoded as a 2-bit vector  
-       (w₁,w₂) ∈ ℤ₂×ℤ₂  with  w₁,w₂ ∈ {–1, 0, 1}.  
-    •  All unitary evolution is **XOR-only** on those two bits.  
-    •  Entropy is **algorithmic**:  S(x)=log₂|compress(x)|.  
-    •  Identity is **intensional Merkle root**; no cryptographic hash.  
-    •  The saddle-point Ξ(⌜Ξ⌝) is the only global fixpoint.
-    |
+    • Deputizing Mask (side-band metadata):
+        - Tracks effective MSB depth: 0 ≤ k ≤ 6.
+        - Masks are **non-destructive**; payload bits remain untouched.
+
+    ByteWord as 2D Morphism:
+    • Each ByteWord is a **genus-2 torus** encoded by (w₁, w₂) ∈ ℤ₂×ℤ₂.
+    • All evolution is **XOR-only** on the winding vector.
+    • Entropy is **algorithmic**: S(x) = log₂|compress(x)|.
+    • Identity is the **intensional Merkle root** (not cryptographic).
+    • The only global fixpoint is Ξ(⌜Ξ⌝): the self-indexing saddlepoint.
+
+2.  Bohmian Dynamics (QSD Integration)
+--------------------------------------
+    MSC inherits a Bohm-like interpretive structure:
+    • The `C` bit acts as the "pilot wave", encoding future morphogenetic 
+      implications at the point of observation.
+    • Like a photon “knowing” if it will hit telescope or chloroplast,
+      `C=1` ByteWords *carry semantic payloads determined by their context*.
+    • QSD interprets this as implicate guidance — structure without trajectory.
+    
+    In MSC, emergence is thermodynamic but **goal-aware**: 
+    ByteWords behave not as programs, but as computational *entities*— 
+    whose minimal description is their execution environment itself.
                                    
 2.  Compound-Architecture
     ---------------
