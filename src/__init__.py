@@ -9,7 +9,10 @@ MSC implements *quantum-coherent computational morphogenesis* through tripartite
 T/V/C ontological typing and Quineic Statistical Dynamics (QSD) field operators.
 Runtime entities exist as **sparse bit-vectors over F₂** (one bit per redex),
 acted upon by **self-adjoint XOR-popcount operators**, enabling non-Markovian
-semantic lifting across compilation phases—**while never leaving L1 cache**.
+semantic lifting across compilation phases—**while never leaving L1 cache**. 
+The MSC framework draws inspiration from teleological and epistemological perspectives, 
+suggesting that computational+distributed processes are akin to quantum phenomena and
+quantum [QSD] not-unlike epistemological Stochastic/[non]Markovian dynamics.
 
 0.  Physical Atom : ByteWord (8-bit)
 -----------------------------------
@@ -176,7 +179,7 @@ X.  Extension targets (to keep in mind)
     -  Morphological algorithms compatible with Jiuzhang 3.0 hot optical-types, SNSPDs  
         -   Operators map to **reconfigurable optical matrices** (reverse fourier transforms) 
 """
-# V2 Core Library: Morphologic Runtime and Ontology
+
 
 import enum
 import time
