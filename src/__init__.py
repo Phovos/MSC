@@ -25,15 +25,22 @@ acted upon by **self-adjoint XOR-popcount operators**, enabling non-Markovian
 semantic lifting across compilation phases—**while never leaving L1 cache**. 
 The MSC framework draws inspiration from teleological and epistemological perspectives, 
 suggesting that computational+distributed processes are symmetric to quantum phenomena;
-and quantum [QSD] is not-unlike Stochastic/[non]Markovian dynamics (differential
+and quantum QSD is not-unlike Stochastic/(non)Markovian dynamics (differential
 geometry and linear algebras; a field theory and its correspondence/covector dual).
 
-0.  Physical Atom : ByteWord (8-bit)
------------------------------------
+# Physical Atom : ByteWord (8-bit)
+  --------------------------------
     ┌---┬---┬---┬---┬---┬---┬---┬---┐
     │ C │ V │ V │ V │ T │ T │ T │ T │   ← raw octet
     └---┴---┴---┴---┴---┴---┴---┴---┘
     'C, V, and T' are binary (0/1) fields interpreted *lazily* by observation.
+
+    ByteWord as 2D Morphism:
+    • Each ByteWord is a **genus-2 torus** encoded by (w₁, w₂) ∈ ℤ₂×ℤ₂.
+    • All evolution is **XOR-only** on the winding vector.
+    • Entropy is **algorithmic**: S(x) = log₂|compress(x)|.
+    • Identity is the **intensional Merkle root** (not cryptographic).
+    • The only global fixpoint is Ξ(⌜Ξ⌝): the self-indexing saddlepoint.
 
     • C — Captain / Thermodynamic MSB
         - `C=1`: active (radiative); `C=0`: dormant (absorptive).
@@ -42,17 +49,22 @@ geometry and linear algebras; a field theory and its correspondence/covector dua
           Models include raycasting and Brownian motion in idealized gas.
     
     • V — Value Field (3 bits, deputizable)
-        - Supports **deputization cascades**, recursively promoting the next V
-          into the MSB role if `C=0`.
-        - This continues until a null-state is reached.
-    
+        - Supports **deputization cascades**, recursively promoting the next Vbits, Tbits
+          into the 'MSB role' if `C=0`.
+        - 'MSB ROLE' never includes the delegation of fundemental thermodynamic 'character', only the 'Actual MSB' Cbit's captaincy creates a 'pointer' ByteWord, that, using the morphosemantics of its interpretation, literally interact with their environment, should it exist, or, it can always recurse over itself 'pacman world'-style.
+        - This continues until a null-state is reached:
+            null-ByteWords are the basis of [[set-builder notation]], along with extensive, 'pointing' ByteWords in the environment when and if they 'collide' or merge.
+
     • T — Type Field (4 bits; winding + arity)
         - Encodes toroidal winding pair (w₁, w₂) ∈ ℤ₂×ℤ₂.
         - Governs directional traversal in ByteWord-space.
         - Also encodes arity and semantic lifting phase.
+        - Includes the bare-minimum required "ISA" for agentic-Motility; is extensible
+        - Only the two least-significant Tbits are needed for all of the above;
+            - The two most-significant Tbits are free-slots for custom "ISA" or other behavior, or just 'value'/magnitude etc.
 
-1.  Physical Layout
--------------------
+    ### "Deputization"
+        -------------
     • NULL (C=0, T=0): identity glue — no semantic content, only topological.
     • NULL-flavored states (C=0, T=0, V>0): inert deputies.
     • Deputizing cascade: 
@@ -63,15 +75,8 @@ geometry and linear algebras; a field theory and its correspondence/covector dua
         - Tracks effective MSB depth: 0 ≤ k ≤ 6.
         - Masks are **non-destructive**; payload bits remain untouched.
 
-    ByteWord as 2D Morphism:
-    • Each ByteWord is a **genus-2 torus** encoded by (w₁, w₂) ∈ ℤ₂×ℤ₂.
-    • All evolution is **XOR-only** on the winding vector.
-    • Entropy is **algorithmic**: S(x) = log₂|compress(x)|.
-    • Identity is the **intensional Merkle root** (not cryptographic).
-    • The only global fixpoint is Ξ(⌜Ξ⌝): the self-indexing saddlepoint.
-
-2.  Bohmian Dynamics (QSD Integration)
---------------------------------------
+    ### Bohmian Dynamics (QSD Integration)
+        ---------------------------------
     MSC inherits a Bohm-like interpretive structure:
     • The `C` bit acts as the "pilot wave", encoding future morphogenetic 
       implications at the point of observation.
@@ -82,116 +87,129 @@ geometry and linear algebras; a field theory and its correspondence/covector dua
     In MSC, emergence is thermodynamic but **goal-aware**: 
     ByteWords behave not as programs, but as computational *entities*— 
     whose minimal description is their execution environment itself.
-                                   
-2.  Compound-Architecture
-    ---------------
-    16-bit  = 2×ByteWord  →  spinor   (address dimension ×2)  
-    32-bit  = 4×ByteWord  →  quaternion (×4)  
-    64-bit  = 8×ByteWord  →  octonion   (×8)  
-    Value space remains **4 states per ByteWord** regardless of width.
 
-    Layer Morphology
+### Compound-Architecture
+    --------------------
+16-bit  = 2×ByteWord  →  spinor   (address dimension ×2)  
+32-bit  = 4×ByteWord  →  quaternion (×4)  
+64-bit  = 8×ByteWord  →  octonion   (×8)  
+Type/Value space remains **4/3 states per ByteWord**, regardless of width.
+
+### Layer Morphology
     -------------------
-    Layer 0  – Torus Logic
-        • 4-valued winding states  
-        • Deterministic XOR cascade (unitary, reversible)
+Layer 0  – Torus Logic
+    • 4-valued winding states  
+    • Deterministic XOR cascade (unitary, reversible)
 
-    Layer 1  – Deputizing Cascade
-        • 7-bit deputy mask mₖ(b)  
-        • Null-state ∅ = topological glue
+Layer 1  – Deputizing Cascade
+    • 7-bit deputy mask mₖ(b)  
+    • Null-state ∅ = topological glue
 
-    Layer 2  – Sparse-Unitary Morphology
-        • 64-bit address dimension for compound ByteWords  
-        • Spinor (16-bit), quaternion (32-bit), octonion (64-bit) addressing
+Layer 2  – Sparse-Unitary Morphology
+    • 64-bit address dimension for compound ByteWords  
+    • Spinor (16-bit), quaternion (32-bit), octonion (64-bit) addressing
 
-    Layer 3  – MSC Semantics
-        • Self-adjoint operator graphs (involutory XOR masks)  
-        • Morphological derivatives Δⁿ = bit-flip chains (bounded ≤ 16)  
-        • Semantic lifting: AtomicReflex → RaiseToOllama → AgenticSupervisor
+Layer 3  – MSC Semantics
+    • Self-adjoint operator graphs (involutory XOR masks)  
+    • Morphological derivatives Δⁿ = bit-flip chains (bounded ≤ 16)  
+    • Semantic lifting: AtomicReflex → RaiseToOllama → AgenticSupervisor
 
-    Layer 4  – Xiang Scroll (debug / pedagogy)
-        • Gödel sentence encoded as Hanzi glyphs  
-        • Xiang = reified diagonal Ξ(⌜Ξ⌝)  
-        • Scroll = visual debugger; **does not affect formal spec**
+Layer 4  – Xiang Scroll (debug / pedagogy)
+    • Gödel sentence encoded as Hanzi glyphs  
+    • Xiang = reified diagonal Ξ(⌜Ξ⌝)  
+    • Scroll = visual debugger; **does not affect formal spec**
 
-
-3.  Sparse-Unitary Semantics & other Invariants
-    -------------------------
-    Operator                :  Involutory XOR mask  (w₁,w₂) ↦ (w₁⊕a, w₂⊕b)  
-    Application             :  ByteWord • ByteWord  =  diagonal XOR  
-    State evolution         :  |ψₜ⟩ → |ψₜ₊₁⟩ via single XOR gate  
-    Entanglement            :  Shared winding masks across ByteWords  
-    Decoherence             :  Mask reset → garbage collect ∅ states
-
-    INVARIANTS
-    -------------------------
-    1. Sparse bit-vector semantics over F₂⁶⁴ (abstract)  
-    2. Unitary, involutory XOR operators on (w₁,w₂)  
-    3. Algorithmic entropy  S(x) = log₂|compress(x)|  (no external Φ)  
-    4. Merkle-root triple equality  hash(src) == merkle(runtime) == merkle(child)
-
-4.  Quineic Saddle-Cycle  (morphodynamic heartbeat)
-    ------------------------------------------------
-    __enter__   :  Non-Markovian descent (history-rich)  
-    __runtime__ :  Liminal oscillation (torus traversal)  
-    __exit__    :  Markovian ascent (ontological snapshot)  
-    Each ByteWord is both **quine=0** (closed loop) and **oracle=1** (probe)
-    depending on the Kronecker delta on its winding pair.
-
-5.  Quantum Mechanics (simulated)
+### Quantum Mechanics (simulated)
     ----------------------------
-    -  **Sparse vector** |ψ⟩ = (w₁,w₂) ∈ ℤ₂×ℤ₂  
-    -  **Involutory operator** Â = XOR mask (reversible, associative)  
-    -  **Entanglement** = shared masks across ByteWords  
-    -  **Decoherence** = mask reset (garbage collect)
+-  **Sparse vector** |ψ⟩ = (w₁,w₂) ∈ ℤ₂×ℤ₂  
+-  **Involutory operator** Â = XOR mask (reversible, associative)  
+-  **Entanglement** = shared masks across ByteWords  
+-  **Decoherence** = mask reset (garbage collect)
 
-6.  Morphological Derivatives
+### Sparse-Unitary Semantics
     -------------------------
-    Δ¹  single-XOR rewrite (compile-time detectable)  
-    Δ²  mask merge (runtime collapse)  
-    Δⁿ  supervisor XOR-chain (≤16 steps)
+Operator                :  Involutory XOR mask  (w₁,w₂) ↦ (w₁⊕a, w₂⊕b)  
+Application             :  ByteWord • ByteWord  =  diagonal XOR  
+State evolution         :  |ψₜ⟩ → |ψₜ₊₁⟩ via single XOR gate  
+Entanglement            :  Shared winding masks across ByteWords  
+Decoherence             :  Mask reset → garbage collect ∅ states
 
-7.  Transducer Algebra
+### INVARIANTS
+    ----------
+1. Sparse bit-vector semantics over F₂⁶⁴ (abstract)  
+2. Unitary, involutory XOR operators on (w₁,w₂)  
+3. Algorithmic entropy  S(x) = log₂|compress(x)|  (no external Φ)  
+4. Merkle-root triple equality  hash(src) == merkle(runtime) == merkle(child)
+
+### Transducer Algebra
     ------------------
-    Map/Filter = bit-mask transducers (O(ω))  
-    Compose = associative XOR chain  
-    Collect = SoA cache-line buffer
+Map/Filter = bit-mask transducers (O(ω))  
+Compose = associative XOR chain  
+Collect = SoA cache-line buffer
 
-8.  Type System
+### Type System
     -----------
-    -  T_co / T_anti  : torus winding direction  
-    -  V_co / V_anti  : value parity under XOR  
-    -  C_co / C_anti  : computation associativity
+In-addition to the afformentioned quantum and classical types, T, V & C:
+-  T_co / T_anti  : torus winding direction  
+-  V_co / V_anti  : value parity under XOR  
+-  C_co / C_anti  : computation associativity
 
-9.  Compilation Pipeline
+### Compilation Pipeline
     --------------------
-    Source → SK terms → ByteWord → XOR cascade  
-    No separate IR; SK **is** the sparse representation.
+Utilizes multiple inheritance along the 'arrow of time' of C3 super() linearization for 'causal' structure.
+Source Code (normal python code) → '@ornament(**xargs)' → 'oranamented' **Morphological** Source Code -> ByteWord → XOR cascade  
+No separate IR; '@ornament(**xargs)' **is** the sparse representation.
 
-9.  Pedagogical Cartoon
-    --------------------
-    Xiang: 象， the Elephant holds the **scroll** whose glyphs are the 4 valued states.  
-    Each torus winding = one Hanzi; the elephant’s memory is the cohomology of
-    all ByteWords.  Debugging = ask Xiang *which glyph flipped*.
+### Quineic Saddle-Cycle (morphodynamic/Quineic lifecycle)
+    ------------------------------------------------------
+__enter__   :  Non-Markovian descent (history-rich, dialectical)  
+__runtime__ :  Liminal oscillation (torus traversal)  
+__exit__    :  Markovian ascent (ontological snapshot)  
+Each ByteWord is both **quine=0** (closed loop) and **oracle=1** (probe)
+depending on the Kronecker delta on its winding pair composed with its observer-dynamics of collapse.
 
-X.  Extension targets (to keep in mind)
-    ------------------------------
-    1. Local LLM inference via semantic indexing
-        – 2-bit semantic embeddings → sub-kernel lookup tables  
-    2. Game objects as morphodynamic entities
-        – 4-state torus = cache-line friendly physics primitives 
-        - Narratives, 'AI', 'difficulty', 'handicap' all become morphosemantic and differentiable.
-    3. Real-time control with SIMD-safe XOR gates
-        – XOR cascade ≤ 4 cycles latency on ARM Cortex-M4  
-    More:
-    -  Frame buffer, Cuda, Vulkan, and, oddly, Language Server Protocol (rpc/repl/lsp)
-    -  WebAssembly : compile SK → 32-bit WASM, each ByteWord → i64  
-    -  DOM entanglement : SharedArrayBuffer zero-copy  
-    -  Edge replication : Merkle-sync (≤256 bytes payload)
-    -  Quantum-classical boundary = ByteWord torus winding + phase mask
-        – 4-state torus maps 1-to-1 to photonic qubit pairs (|00⟩,|01⟩,|10⟩,|11⟩) 
-    -  Morphological algorithms compatible with Jiuzhang 3.0 hot optical-types, SNSPDs  
-        -   Operators map to **reconfigurable optical matrices** (reverse fourier transforms) 
+### Morphological Derivatives
+    -------------------------
+Δ¹  single-XOR rewrite (compile-time detectable)  
+Δ²  mask merge (runtime collapse)  
+Δⁿ  supervisor XOR-chain (≤16 steps)
+
+### Xiang's Scroll (Cartoon Pedagogical Debugging)
+    ----------------------------------------------
+Xiang: 象, the Morphodynamical Elephant, holds the scroll of glyphs (道, 和, 衍, 。). His memory is
+the cohomology of all ByteWords, enabling relational recall and debugging. The scroll encodes
+infinite semantic potential in finite glyphs, acting as a compactified morphogenetic manifold.
+
+    #### Example Interpretation (what appears on Xiangs scroll and gets served to the LSP)
+    ----------------------
+    (X is any topological bitwise character/computation)
+    < C=0 ☰ | X 道 >:
+        - C=0: Intensive state → Apply trigram modulation.
+        - ☰ (Qian): XOR transformation → Dynamic change applied to 道.
+        - Result: Transform the least-action compression axis of 道.
+
+    < C=1 ☰ | X 和 >:
+        - C=1: Extensive state → Ignore trigram.
+        - Behavior: Move horizontally across the torus with harmonic balance.
+
+### Extension targets (to keep in mind)
+    -----------------------------------
+1. Local LLM inference via semantic indexing
+    – 2-bit semantic embeddings → sub-kernel lookup tables  
+2. Game objects as morphodynamic entities
+    – 4-state torus = cache-line friendly physics primitives 
+    - Narratives, 'AI', 'difficulty', 'handicap' all become morphosemantic and differentiable.
+3. Real-time control with SIMD-safe XOR gates
+    – XOR cascade ≤ 4 cycles latency on ARM Cortex-M4  
+More:
+-  Frame buffer, Cuda, Vulkan, and, oddly, Language Server Protocol (rpc/repl/lsp)
+-  WebAssembly : compile SK → 32-bit WASM, each ByteWord → i64  
+-  DOM entanglement : SharedArrayBuffer zero-copy  
+-  Edge replication : Merkle-sync (≤256 bytes payload)
+-  Quantum-classical boundary = ByteWord torus winding + phase mask
+    – 4-state torus maps 1-to-1 to photonic qubit pairs (|00⟩,|01⟩,|10⟩,|11⟩) 
+-  Morphological algorithms compatible with Jiuzhang 3.0 hot optical-types, SNSPDs  
+    -   Operators map to **reconfigurable optical matrices** (reverse fourier transforms) 
 """
 
 T = TypeVar('T')
