@@ -13,6 +13,27 @@ Me&MSC online: <a href="https://www.reddit.com/r/Morphological/">r/Morphological
 
 © 2025 by [Phovos](https://github.com/Phovos). Licensed under [Creative Commons Attribution 4.0 International][cc-by].
 
+## Best practices:
+- Utilize [[camelCase]] for internal source code
+- Utilize [[CAPS_CASE]] for [[FFI]] funcs and external source
+- We don't dislike comment-lines, matter-of fact we prefer them to a wrapping comment
+- Comment lines, should the exist, count as 'empty lines' insofar as enforcing line breaks between classes, methods, etc. and so no empty line is needed between the end of one class and the start of another class that has a comment line directly above it, or its decorator(s)
+
+## [[Frontmatter]] for internal documentation
+
+ - Utilize 'frontmatter' to include the title and other `property`, `tag`, etc. in the knowledge base article(s).
+   
+   - For Example:
+      ```
+      ---
+      name: "Article Title"
+      link: "[[Related Link]]"
+      linklist:
+        - "[[Link1]]"
+        - "[[Link2]]"
+      ---
+      ```
+
 # Morphological Source Code (MSC):
 
     The Quantum Bridge to Data-Oriented Design
@@ -244,8 +265,6 @@ In quantum field theory, duality and quantization are central themes:
     Linking Structures : 
         The visualization of linking structures where pairs of points or states are connected can represent entangled states or particle-antiparticle pairs.
         These connections reflect underlying symmetries and conservation laws, such as charge conjugation and parity symmetry.
-         
-     
 
 Particle-Antiparticle Pairs and Entanglement 
 
@@ -259,10 +278,10 @@ The idea of "doubling" through particle-antiparticle pairs or entangled states h
     Entangled States : 
         Entangled states exhibit correlations between distant particles, defying classical intuition.
         These states can be described using tensor products of Hilbert spaces, reflecting the non-local nature of quantum mechanics.
-         
-     
 
 XNOR Gate and Abelian Dynamics 
+
+> TODO: make a XOR section for sparse vectors, continious bijection and identity function, etc. 'XOR' is much faster than 'XNOR' and therefore this section needs to be rewritten.
 
 An XNOR gate performs a logical operation that outputs true if both inputs are the same and false otherwise. You propose that an XNOR 2:1 gate could "abelize" all dynamics by performing abelian continuous bijections. Let's explore this concept: 
 
@@ -277,12 +296,9 @@ An XNOR gate performs a logical operation that outputs true if both inputs are t
         Abelian groups have commutative operations, meaning a⋅b=b⋅a.
         To "abelize" dynamics means to ensure that the operations governing the system are commutative, simplifying analysis and ensuring predictable behavior.
          
-
     Continuous Bijection : 
         A continuous bijection implies a one-to-one mapping between sets that preserves continuity.
         In the context of XNOR gates, this might refer to mapping input states to output states in a reversible and consistent manner.
-         
-     
 
 Second Law of Thermodynamics and Entropy 
 
@@ -291,13 +307,10 @@ For a gate to obey the second law of thermodynamics, it must ensure that any dec
     Entropy Increase : 
         Any irreversible process increases total entropy.
         Reversible processes maintain constant entropy but cannot decrease it.
-         
 
     Compensating Entropy : 
         If a gate operation decreases local entropy (e.g., by organizing information), it must create compensating disorder elsewhere.
         This can occur through heat dissipation, increased thermal noise, or other forms of entropy generation.
-         
-     
 
 Practical Example: Quantum Gates and Entropy 
 
@@ -306,13 +319,10 @@ Consider a quantum gate operating on qubits:
     Unitary Operations : 
         Unitary operations on qubits are reversible and preserve total probability (norm).
         However, implementing these operations in real systems often involves decoherence and dissipation, leading to entropy increase.
-         
 
     Thermodynamic Considerations : 
         Each gate operation introduces some level of noise or error, contributing to entropy.
         Ensuring that the overall system maintains non-decreasing entropy requires careful design and error correction mechanisms.
-         
-     
 
 Connecting XNOR Gates and Abelian Dynamics 
 
@@ -326,8 +336,6 @@ To understand how an XNOR gate might "abelize" dynamics:
     Continuous Bijection : 
         Mapping input states to output states continuously ensures smooth transitions without abrupt changes.
         This can model reversible transformations, aligning with abelian group properties.
-         
-     
 
 Chirality and Symmetry Breaking 
 
@@ -336,16 +344,14 @@ Chirality and symmetry breaking add another layer of complexity:
     Chirality : 
         Chiral systems lack reflection symmetry, distinguishing left-handed from right-handed configurations.
         This asymmetry affects interactions and dynamics, influencing particle properties and forces.
-         
 
     Symmetry Breaking : 
         Spontaneous symmetry breaking occurs when a system chooses a particular state despite having multiple symmetric possibilities.
         This phenomenon underlies many phase transitions and emergent phenomena in physics.
 
-
+### TODO: Sheaf-locality, gluing, topos, fibration, and positioning re: "tensors" (matrixes) (of binary/reals) vs genus-2 torus topological-derivative complex unit spheres and global wave functions as intrinsics (rhetorical comparison to numpy).
 
 Involution & convolution; Abelianization of dynamics, entropy generation using star-algebras, unitary ops and exponential + complex exponential functions:
-
 
 ____
 
@@ -356,8 +362,6 @@ Monoids
     In your context:
         Monoids model combinatorial operations  like convolution or hashing.
         They describe how "atoms" (e.g., basis functions, modes) combine to form larger structures.
-         
-     
 
 Abelian Groups  
 
@@ -365,8 +369,6 @@ Abelian Groups
     In your framework:
         Abelian groups describe reversible transformations  (e.g., unitary operators in quantum mechanics).
         They underpin symmetries  and conservation laws .
-         
-     
 
 Atoms/Nouns/Elements  
 
@@ -375,9 +377,6 @@ Atoms/Nouns/Elements
         Perturbations are decomposed into linear combinations of these irreps: `δρ=n∑​i∑​ci(n)​ϕi(n)`​, where:
             ci(n)​: Coefficients representing the strength of each mode.
             ϕi(n)​: Basis functions describing spatial dependence.
-             
-         
-     
 
 2. Involution, Convolution, Sifting, Hashing  
 Involution  
@@ -386,8 +385,6 @@ Involution
     In your framework:
         Involution corresponds to time reversal  (f∗(t)=f(−t)​) or complex conjugation .
         It ensures symmetry in operations like Fourier transforms or star algebras.
-         
-     
 
 Convolution  
 
@@ -395,20 +392,16 @@ Convolution
     Key properties:
         Associativity : (f∗g)∗h=f∗(g∗h).
         Identity Element : The Dirac delta function acts as the identity: f∗δ=f.
-         
-     
 
 Sifting Property  
 
     The Dirac delta function "picks out" values:∫−∞∞​f(t)δ(t−a)dt=f(a).
     This property is fundamental in signal processing and perturbation theory.
-     
 
 Hashing  
 
     Hashing maps data to fixed-size values, often using modular arithmetic or other algebraic structures.
     In your framework, hashing could correspond to projecting complex systems onto simpler representations (e.g., irreps).
-     
 
 3. Complex Numbers, Exponentials, Trigonometry  
 Complex Numbers  
@@ -416,20 +409,16 @@ Complex Numbers
     Complex numbers provide a natural language for oscillatory phenomena:
         Real part: Amplitude.
         Imaginary part: Phase.
-         
-     
 
 Exponential Function  
 
     The complex exponential eiωt encodes sinusoidal behavior compactly:eiωt=cos(ωt)+isin(ωt).
     This is central to Fourier analysis, quantum mechanics, and control systems.
-     
 
 Trigonometry  
 
     Trigonometric functions describe periodic motion and wave phenomena.
     They are closely tied to the geometry of circles and spheres, which appear in symmetry groups.
-     
 
 4. Control Systems: PID and PWM  
 PID Control  
@@ -440,27 +429,23 @@ PID Control
         Derivative term : Rate of change of error.
          
     In your framework, PID could correspond to feedback mechanisms in dynamical systems.
-     
 
 PWM (Pulse Width Modulation)  
 
     PWM encodes information in the width of pulses.
     It is used in digital-to-analog conversion and motor control.
     In your framework, PWM could represent discretized versions of continuous signals.
-     
 
 5. Unitary Operators and Symmetry  
 Unitary Operators  
 
     Unitary operators preserve inner products and describe reversible transformations:U†U=I,where U† is the adjoint (conjugate transpose) of U.
     In quantum mechanics, unitary operators represent evolution under the Schrödinger equation:∣ψ(t)⟩=U(t)∣ψ(0)⟩.
-     
 
 Symmetry  
 
     Symmetry groups classify transformations that leave a system invariant.
     Representation theory decomposes symmetries into irreducible components (irreps).
-
 
 # Quantum Informatic Systems and Morphological Source Code
 ## The N/P Junction as Quantum Binary Ontology
@@ -474,7 +459,6 @@ Quantum-Electronic Phenomenology
     Information is not abstract—it is a physical phenomenon that evolves within the framework of quantum mechanics.
     Singularity as Continuous State Transformation
     The singularity is not a moment of technological convergence but an ongoing process of state transformation, where observation itself is an active part of the negotiation.
-
 
 ## what is 'motility' & 'CCC'?
 
@@ -505,43 +489,6 @@ This paradigm aims to create AI agents that can not only learn and reason, but a
 **training, RLHF, outcomes, etc.**
 Every CCC db is itself a type of training and context but built specifically for RUNTIME abstract agents and specifically not for concrete model training. This means that you can train a CCC db with a human, but you can also train a CCC db with a RLHF agent. This is a key distinction between CCC and RLHF. In other words, every CCCDB is like a 'model' or an 'architecture' for a RLHF agent to preform runtime behavior within such that the model/runtime itself can enable agentic motility - with any LLM 'model' specifically designed for consumer usecases and 'small' large language models.
 
-
-## Best practices:
-- Utilize camelCase for internal source code
-- Utilize CAPS_CASE for ffi funcs and external source
-
-## Frontmatter Implementation
-
- - Utilize 'frontmatter' to include the title and other `property`, `tag`, etc. in the knowledge base article(s).
-   
-   - For Example:
-      ```
-      ---
-      name: "Article Title"
-      link: "[[Related Link]]"
-      linklist:
-        - "[[Link1]]"
-        - "[[Link2]]"
-      ---
-      ``` """
-
-
-# Core Summary
-Core Ideas:
-    Interactive Runtime Environments: You're contemplating systems where both player behaviors and agent decisions inform and restructure each other, forming emergent, adaptive ecosystems.
-    Bi-directional Learning: This reciprocal relationship fosters a deeper integration of human-like adaptability in AI systems, merging deterministic and statistical learning methodologies.
-
-Dynamic Execution:
-    Nonlinear Dynamics of Play and Inference: Players navigate and modify their environment actively, while ML agents iterate on decisions, learning in real-time.
-    Anticipatory Computation: Both paradigms involve predicting future states, aligning with anticipatory systems that adjust based on potential future configurations rather than solely historical data.
-
-Innovations and Applications:
-    Morphological Source Code: This concept involves source code that evolves with system state, expanding possibilities for self-modifying code that can dynamically represent and transform application behavior.
-    Live Feedback and Adaptability: Techniques from live coding and agile development can inform AI model training, making real-time state management inherent to AI systems.
-    Cross-Domain Fusion: By integrating gaming techniques (like game-state interaction) with machine learning, you could develop systems where AI and interactive environments inform each other symbiotically.
-
-
-
 Zeroth Law (Holographic Foundation):
     Symbols and observations are perceived as real due to intrinsic system properties, creating self-consistent realities.
 
@@ -551,7 +498,6 @@ Binary Fundamentals and Complex Triads:
 
 Axiom of Potentiality and Observation (Rulial Dynamics):
     The system's state space includes all potential states, ontologically relevant only at the point of observation. 'Non-relativistic' =~ 'Non-Markovian' in this sense, relatiavistic markovians being-bounded via causality.
-
 
 The Shape of Information
 
@@ -597,10 +543,11 @@ The core thesis: computational systems can be designed to evolve dynamically whi
 Statistical Mechanics of Computation
 Imagine treating computational state not as a fixed configuration, but as a probabilistic landscape. Each memory access is a potential state transition Cognitive systems have entropy and energy states Runtime becomes a thermodynamic process of information negotiation
 
-## [[CAP Theorem vs Gödelian Logic in Hilbert Space]]
+## TODO: connect the Hinkensian complete and Turing Complete
+## CAP Theorem vs Gödelian Logic in Hilbert Space
 
-- {{CAP}}: {Consistency, Availability, Partition Tolerance}
-- {{Gödel}}: {Consistency, Completeness, Decidability}
+- [[CAP]]: {Consistency, Availability, Partition Tolerance}
+- [[Gödel]]: {Consistency, Completeness, Decidability}
 - Analogy: Both are trilemmas; choosing two limits the third
 - Difference:
   - CAP is operational, physical (space/time, failure)
