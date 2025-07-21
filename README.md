@@ -662,6 +662,81 @@ A DSL or runtime model where source code *is parsed into Hilbert-space operators
 * LLMs → Semantic normalization of morphisms
 
 ---
+### Extensionality in MSC
+The principle of **extensionality** states:
+- Two functions (or ByteWords, in MSC) are considered the same **if and only if** they produce identical outputs for all possible inputs.
+
+In MSC, this principle applies to ByteWords because:
+- Arguments are inherently other ByteWords.
+- Functions are represented as transformations on ByteWords, often through **XOR-popcount operators** or other morphodynamic processes.
+
+However, the **limited scope of arguments and references** introduces an interesting wrinkle:
+- If all arguments are drawn from a **limited, locked-in L1 cache collection of ByteWords**, then two functions may appear extensionally equivalent because:
+  - They operate on the same finite set of inputs.
+  - Their outputs coincide for this limited set of ByteWords.
+
+This raises the question: **Are these functions truly the same, or do they differ in character?**
+
+### Intensionality and Character
+While **extensionality** focuses on observable behavior, **intensionality** considers the internal structure or "character" of the functions."character" can manifest in several ways:
+
+Morphological Structure
+- The **T bits** (toroidal windings) and **V bits** (deputy masks) of ByteWords encode their internal structure:
+  - Example: Two ByteWords might have identical outputs for a given set of inputs but differ in their winding pairs `(w₁, w₂)`.
+
+Thermodynamic State
+- The **C bit** (Captain bit) determines whether a ByteWord is active (`C=1`) or dormant (`C=0`):
+  - Example: Two ByteWords might behave identically in terms of outputs but differ in their thermodynamic state.
+
+Entanglement
+- ByteWords can be entangled through shared winding masks:
+  - Example: Two ByteWords might produce the same outputs but differ in their entanglement relationships and history with other ByteWords.
+
+Deputizing Cascad
+- The **deputizing cascade** introduces a recursive history that influences the behavior of ByteWords:
+  - Example: Two ByteWords might appear extensionally equivalent but differ in their historical deputization paths.
+
+Why This Happens Frequently
+- **Arguments are limited**: All arguments are drawn from a small, fixed collection of ByteWords in L1 cache.
+- **Sparse-unitary semantics**: The sparse representation of ByteWords ensures that many transformations are locally indistinguishable.
+- **Non-Markovian dynamics**: The history of ByteWords influences their behavior, creating subtle differences that may not be apparent in extensional evaluations.
+
+As a result:
+- Two ByteWords might appear **extensionally equivalent** when evaluated over a limited set of inputs.
+- However, they may differ in **intensional character**, reflecting deeper structural or relational differences.
+
+Limited Argument Scope
+- Suppose you have two ByteWords, `A` and `B`, operating on a small set of inputs `{X, Y, Z}`:
+  - Both `A` and `B` produce identical outputs for `{X, Y, Z}`.
+  - However, their internal structures (e.g., winding pairs, deputy masks) differ.
+
+Extensional Equivalence
+- From an **extensional perspective**, `A` and `B` are the same:
+  - Example: They satisfy the principle of extensionality for the given inputs.
+
+Intensional Differences
+- From an **intensional perspective**, `A` and `B` differ:
+  - Example: Their winding pairs `(w₁, w₂)` or entanglement relationships reveal distinct characters.
+
+Emergent Behavior
+- Over time, the differences in character may become apparent:
+  - Example: A new input `W` might expose the divergence between `A` and `B`.
+
+### Resolution Through Morphodynamics
+This framework provides tools to resolve this tension through **morphodynamic processes**:
+
+Saddle-Point Dynamics
+- The saddle-point acts as a filter, balancing extensional equivalence and intensional character:
+  - Example: At the saddle-point, two ByteWords might temporarily converge before diverging again.
+
+Kronecker Delta
+- The **Kronecker delta** can determine whether two ByteWords are truly the same:
+  - Example: If $\delta_{A,B} = 1$, then `A` and `B` are identical; otherwise, they differ.
+
+Algorithmic Entropy
+- The **algorithmic entropy** of ByteWords captures their complexity, revealing hidden differences:
+  - Example: Two ByteWords with identical outputs might have different entropies due to their internal structures.
+---
 
 ## Quine + Demonology (observer, computor, but who was her?)
 
