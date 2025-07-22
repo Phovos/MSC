@@ -9,6 +9,7 @@ import sys
 import math
 import enum
 import logging
+import logging.config
 import argparse
 import platform
 import multiprocessing
@@ -433,15 +434,27 @@ if __name__ == "__main__":
     import argparse
     import os
     import re
-
-    parser = argparse.ArgumentParser(description="Run the app with semantic version as CID.")
-    parser.add_argument("--version", type=str, help="Semantic version to use as correlation ID")
+    def is_valid_semver(version: str) -> bool:
+        # Accepts optional leading 'v', e.g. "v1.2.3" or "1.2.3"
+        return re.match(r"^v?\d+\.\d+\.\d+$", version) is not None
+    parser = argparse.ArgumentParser(description="Run MSC with specified version.")
+    parser.add_argument(
+        "--version",
+        help="The semantic version to use (e.g. 0.0.12 or v0.0.12)",
+        required=True,
+    )
     args = parser.parse_args()
+    version = args.version
 
-    version = args.version or os.getenv("APP_VERSION", "RUNTIME")
-    SEMVER_PATTERN = r"^v\d+\.\d+\.\d+$"
-    if not re.match(SEMVER_PATTERN, version):
-        raise ValueError(f"Invalid semantic version format: {version}")
+    if version.startswith("v"):
+        version = version[1:]
+
+    if not is_valid_semver(version):
+        print(f"Invalid semantic version format: {version}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"[INFO] Using version: {version}")
+
     log = LogAdapter(correlation_id=version)
     log.logger.debug("Debug level test; 'Hello world!'")
     log.logger.warning("Warning with CID and colors")

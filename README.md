@@ -1,38 +1,40 @@
+---
+name: "README.md"
+description: "This is the top-level ![README.md](/README.md)."
+version: "see pyproject.toml for single source of truth"
+---
+
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Python 3.12+](https://img.shields.io/badge/Python-3.12+-3776AB.svg?logo=python)](https://www.python.org)
 [![Status: Experimental](https://img.shields.io/badge/Status-Experimental-red.svg)](https://github.com/Phovos/MSC)
 
-[cc-by]: http://creativecommons.org/licenses/by/4.0/
-[cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
 
 **Welcome to the Morphological Source Code (MSC) repository!**
 
-This is the top-level ![README.md](/README.md).
+© 2025 by [Phovos](https://github.com/Phovos). Licensed under [Creative Commons Attribution 4.0 International][cc-by].
 
 Me&MSC online: <a href="https://www.reddit.com/r/Morphological/">r/Morphological</a>|<a href="https://x.com/Phovso">Phovos(Phovso)@X</a>|<a href="https://www.youtube.com/@phovos">Phovos@youtube</a>|<a href="https://app.gitter.im/#/room/#msc:gitter.im">MSC gitter(dev-chat)</a>
 
-© 2025 by [Phovos](https://github.com/Phovos). Licensed under [Creative Commons Attribution 4.0 International][cc-by].
-
-## Best practices:
+Best practices:
 - Utilize [[camelCase]] for internal source code
 - Utilize [[CAPS_CASE]] for [[FFI]] funcs and external source
 - We don't dislike comment-lines, matter-of fact we prefer them to a wrapping comment
 - Comment lines, should the exist, count as 'empty lines' insofar as enforcing line breaks between classes, methods, etc. and so no empty line is needed between the end of one class and the start of another class that has a comment line directly above it, or its decorator(s)
+- To examine ruff rules and align them with your choices, I've heavily customized many things. Modify your `pyproject.toml` to change the settings:
+    - `ruff rule --all --output-format json | jq '.[] | "\(.code): \(.name) - \(.summary)"'` To examine ruff rules and align them with your choices, I've heavily customized many things. Modify your `pyproject.toml` to change the settings.
+- [[Frontmatter]] for internal documentation (may be hidden by your reader):
+    - Utilize 'frontmatter' to include the title and other `property`, `tag`, etc. in the knowledge base article(s).
+    - For Example (no backticks, but does include 'dashes'):
 
-## [[Frontmatter]] for internal documentation
-
- - Utilize 'frontmatter' to include the title and other `property`, `tag`, etc. in the knowledge base article(s).
-   
-   - For Example:
-      ```
-      ---
-      name: "Article Title"
-      link: "[[Related Link]]"
-      linklist:
-        - "[[Link1]]"
-        - "[[Link2]]"
-      ---
-      ```
+            ```
+            ---
+            name: "Article Title"
+            link: "[[Related Link]]"
+            linklist:
+                - "[[Link1]]"
+                - "[[Link2]]"
+            ---
+            ```
 
 # Morphological Source Code (MSC):
 
