@@ -5,72 +5,19 @@ from __future__ import annotations
 Standard Library Imports - 3.13 std libs **ONLY**"""
 import re
 import os
-import io
-import dis
 import sys
-import ast
-import time
-import site
 import math
 import enum
-import mmap
-import json
-import uuid
-import cmath
-import shlex
-import errno
-import random
-import socket
-import struct
-import shutil
-import pickle
-import pstats
-import ctypes
-import signal
 import logging
-import decimal
-import tomllib
-import weakref
-import pathlib
-import asyncio
-import inspect
-import hashlib
-import tempfile
-import cProfile
 import argparse
 import platform
-import datetime
-import traceback
-import functools
-import linecache
-import importlib
-import threading
-import subprocess
-import tracemalloc
-import http.server
-import collections
 import multiprocessing
-from logging import config
-from io import StringIO
-from decimal import Decimal, getcontext
-from array import array
-from pathlib import Path
-from enum import Enum, auto, StrEnum, IntEnum
-from queue import Queue, Empty
 from abc import ABC, abstractmethod
-from threading import Thread, RLock
 from dataclasses import dataclass, field
-from logging import Formatter, StreamHandler
-from collections import defaultdict, deque
-from collections.abc import Iterable, Mapping
-from concurrent.futures import ThreadPoolExecutor
-from functools import reduce, lru_cache, partial, wraps
-from contextlib import contextmanager, asynccontextmanager, AbstractContextManager
-from importlib.util import spec_from_file_location, module_from_spec
-from types import SimpleNamespace, ModuleType,  MethodType, FunctionType, CodeType, TracebackType, FrameType
+from collections.abc import Iterable
+from functools import reduce
 from typing import (
-    Any, Dict, List, Optional, Union, Callable, TypeVar, Tuple, Generic, Set, Iterator, OrderedDict,
-    Coroutine, Type, NamedTuple, ClassVar, Protocol, runtime_checkable, AsyncIterator,
+    Any, Dict, List, Optional, Union, Callable, TypeVar, Set, Type,
 )
 try:
     if platform.system() == "Windows":
@@ -173,7 +120,7 @@ class LogAdapter:
             'root': {
                 'level': 'INFO',
                 # This will be determined by whether a queue is used or not
-                'handlers': [] 
+                'handlers': []
             }
         }
         # The list of handlers that do the actual work (writing to console/file)
@@ -184,7 +131,7 @@ class LogAdapter:
             self.LOGGING_CONFIG['handlers']['queue'] = {
                 'class': 'logging.handlers.QueueHandler',
                 # This is the crucial missing piece:
-                'handlers': destination_handlers, 
+                'handlers': destination_handlers,
                 'queue': multiprocessing.Queue(self.queue_size),
             }
             self.LOGGING_CONFIG['root']['handlers'] = ['queue']
@@ -316,7 +263,7 @@ class EntanglementType(enum.Enum):
 
 # Kronecker Field Function for Quantum Coherence
 def kronecker_field(q1: Any, q2: Any, temperature: float) -> float:
-    dot = sum(a * b for a, b in zip(q1.state.vector, q2.state.vector))
+    dot = sum(a * b for a, b in zip(q1.state.vector, q2.state.vector, strict=False))
     if temperature > 0.5:
         return math.cos(dot)
     return 1.0 if dot > 0.99 else 0.0
@@ -483,12 +430,21 @@ def format_complex_matrix(matrix: List[List[complex]], precision: int = 3) -> st
     return "[\n " + "\n ".join(result) + "\n]"
 
 if __name__ == "__main__":
-    log = LogAdapter()
-    log.logger.debug("Debug level test; \"Hello world!\"")
-    log.logger.warning("Warning with CID and colors")
-    log = LogAdapter(correlation_id="INIT")
+    import argparse
+    import os
+    import re
+
+    parser = argparse.ArgumentParser(description="Run the app with semantic version as CID.")
+    parser.add_argument("--version", type=str, help="Semantic version to use as correlation ID")
+    args = parser.parse_args()
+
+    version = args.version or os.getenv("APP_VERSION", "RUNTIME")
+    SEMVER_PATTERN = r"^v\d+\.\d+\.\d+$"
+    if not re.match(SEMVER_PATTERN, version):
+        raise ValueError(f"Invalid semantic version format: {version}")
+    log = LogAdapter(correlation_id=version)
+    log.logger.debug("Debug level test; 'Hello world!'")
     log.logger.warning("Warning with CID and colors")
     log.logger.error("Error occurred in something")
-    log = LogAdapter(correlation_id="RUNTIME")
     log.logger.critical("Critical issue reported")
     print(f'Find logs @ {log.broadcast_filename}')

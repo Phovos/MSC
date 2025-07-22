@@ -53,13 +53,22 @@ ignore_missing_imports = true
 [tool.ruff]
 line-length = 88
 exclude = ["build/", "dist/", ".venv/"]
+extend-ignore = [
+    "E501",  # line too long
+    "W291",  # trailing whitespace
+    "W293",  # blank line contains whitespace
+    "W391",  # blank line at end of file
+    "D206",  # docstring whitespace errors
+    "D300",  # triple double quotes on one line
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "B"]
 
-[tool.flake8]
-max-line-length = 88
-extend-ignore = ["E203", "W503"]
+[tool.ruff.format]
+quote-style = "preserve"
+skip-magic-trailing-comma = true
+line-ending = "auto"
 
 [tool.uv.workspace]
 members = ["packages/*"]
