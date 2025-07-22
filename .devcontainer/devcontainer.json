@@ -47,7 +47,7 @@
   },
   "onCreateCommand": "if [ \"$CODESPACES\" = \"true\" ]; then echo 'In Codespaces: Running minimal setup'; else bash .devcontainer/provisioning.sh; fi || true",
   "postCreateCommand": "uv venv .venv && uv pip install -U jupyterlab nox",
-  "postStartCommand": "bash .devcontainer/provisioning.sh && bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/provisioning.sh",
   "forwardPorts": [8000, 8888, 8341],
   "runArgs": ["--network=host"],
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
