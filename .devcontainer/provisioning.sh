@@ -3,9 +3,15 @@ FILE=$1
 
 echo "Initializing Python bridge..."
 
-jq -c '.repository[]' "$FILE" | while read -r instance; do
-  id=$(echo "$instance" | jq -r '.id')
-  echo "[PYTHON] Sending instance $id to Python"
+# Extract version using a Python script
+version=$(python3 appBridge.py)
 
-  echo "$instance" | python3 -u main.py
-done
+if [ -z "$version" ]; then
+  echo "Error: Version not found in pyproject.toml."
+  exit 1
+fi
+
+echo "[PYTHON] Sending version $version to Python"
+
+# Assuming the version is sent as a JSON object
+echo "{\"version\": \"$version\"}" | python3 -u main.py
