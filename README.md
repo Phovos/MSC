@@ -15,7 +15,7 @@ root: "."
 
 CommunityLinks: [r/Morphological](https://www.reddit.com/r/Morphological/) | [Phovos(Phovso)@X](https://x.com/Phovso) | [Phovos@youtube](https://www.youtube.com/@phovos) | [MSC gitter(dev-chat)](https://app.gitter.im/#/room/#msc:gitter.im)
 
-Other than the **Golden Rule**; our only other rule for community, contribution, and interaction is to do as thou wilt. We **recommend** both critical and empathic thinking, and, indeed, **urge** grounding in thermodynamic, if no-other, global-shared-realities, beyond, whatever, could be considered-to-be _your own_. We do not anticipate a moral or philosophical means of deviating from this principle becoming realistic in the near-future, but we **will** work to keep you apprised of any changes to such criticalities as 'etics', 'episimological-behavioral-analysis', 'alignment', and the conventional, gauche, concept of the LICENSE (mentioned above, and throughout).
+Other than the **Golden Rule**; our only other rule for community, contribution, and interaction is to do as thou wilt. We **recommend** both critical and empathic thinking, and, indeed, **urge** grounding in thermodynamic, if no-other, global-shared-realities, beyond, whatever, could be considered-to-be _your own_. We do not anticipate a moral or philosophical means of deviating from this principle becoming realistic in the near-future, but we **will** work to keep you apprised of any changes to such criticality(s) as project: 'ethics', 'epistemological-behavioral-analysis', 'alignment', and the conventional, gauche, concept of the LICENSE (alluded-to above, and throughout).
 
 # Morphological Source Code (MSC):
 
