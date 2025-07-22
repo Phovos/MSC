@@ -217,9 +217,12 @@ V = TypeVar('V')
 C = TypeVar('C')
 
 MSC_REGISTRY: Dict[str, Set[str]] = {'classes': set(), 'functions': set()}
+
+
 class MorphodynamicCollapse(Exception):
     """Raised when a morph object destabilizes under thermal pressure."""
     pass
+
 
 @dataclass
 class MorphSpec:
@@ -229,6 +232,7 @@ class MorphSpec:
     memory: dict
     signature: str
 
+
 def morphology(source_model: Type) -> Callable[[Type], Type]:
     """Decorator: register & validate a class against a MorphSpec."""
     def decorator(target: Type) -> Type:
@@ -236,34 +240,38 @@ def morphology(source_model: Type) -> Callable[[Type], Type]:
         # Ensure target has all annotated fields from source_model
         for field_name in getattr(source_model, '__annotations__', {}):
             if field_name not in getattr(target, '__annotations__', {}):
-                raise TypeError(f"{target.__name__} missing field '{field_name}'")
+                raise TypeError(
+                    f"{target.__name__} missing field '{field_name}'")
         MSC_REGISTRY['classes'].add(target.__name__)
         return target  # return cls (alt)
     return decorator
 
+
 class MorphicComplex:
     """Complex number with morphic properties."""
+
     def __init__(self, real: float, imag: float):
         self.real = real
         self.imag = imag
-    
+
     def conjugate(self) -> 'MorphicComplex':
         return MorphicComplex(self.real, -self.imag)
-    
+
     def __add__(self, other: 'MorphicComplex') -> 'MorphicComplex':
         return MorphicComplex(self.real + other.real, self.imag + other.imag)
-    
+
     def __mul__(self, other: 'MorphicComplex') -> 'MorphicComplex':
         return MorphicComplex(
             self.real*other.real - self.imag*other.imag,
             self.real*other.imag + self.imag*other.real
         )
-    
+
     def __repr__(self) -> str:
         if self.imag == 0:
             return f"{self.real}"
         sign = "+" if self.imag >= 0 else ""
         return f"{self.real}{sign}{self.imag}j"
+
 
 class MorphologicalRule:
     def __init__(self, symmetry: str, conservation: str, lhs: str, rhs: List[str]):
@@ -271,12 +279,13 @@ class MorphologicalRule:
         self.conservation = conservation
         self.lhs = lhs
         self.rhs = rhs
-    
+
     def apply(self, seq: List[str]) -> List[str]:
         if self.lhs in seq:
             idx = seq.index(self.lhs)
             return seq[:idx] + self.rhs + seq[idx+1:]
         return seq
+
 
 class Morphology(enum.IntEnum):
     MORPHIC = 0
@@ -284,30 +293,35 @@ class Morphology(enum.IntEnum):
     MARKOVIAN = -1
     NON_MARKOVIAN = 1  # placeholder for sqrt(-1j)
 
+
 class QState(enum.Enum):
     SUPERPOSITION = 1
-    ENTANGLED    = 2
-    COLLAPSED    = 4
-    DECOHERENT   = 8
+    ENTANGLED = 2
+    COLLAPSED = 4
+    DECOHERENT = 8
+
 
 class QuantumCoherenceState(enum.Enum):
     SUPERPOSITION = "superposition"
-    ENTANGLED     = "entangled"
-    COLLAPSED     = "collapsed"
-    DECOHERENT    = "decoherent"
-    EIGENSTATE    = "eigenstate"
+    ENTANGLED = "entangled"
+    COLLAPSED = "collapsed"
+    DECOHERENT = "decoherent"
+    EIGENSTATE = "eigenstate"
+
 
 class EntanglementType(enum.Enum):
-    CODE_LINEAGE     = "code_lineage"
-    TEMPORAL_SYNC    = "temporal_sync"
-    SEMANTIC_BRIDGE  = "semantic_bridge"
+    CODE_LINEAGE = "code_lineage"
+    TEMPORAL_SYNC = "temporal_sync"
+    SEMANTIC_BRIDGE = "semantic_bridge"
     PROBABILITY_FIELD = "probability_field"
+
 
 def kronecker_field(q1: MorphologicPyOb, q2: MorphologicPyOb, temperature: float) -> float:
     dot = sum(a * b for a, b in zip(q1.state.vector, q2.state.vector))
     if temperature > 0.5:
         return math.cos(dot)
     return 1.0 if dot > 0.99 else 0.0
+
 
 def elevate(data: Any, cls: Type) -> object:
     """Raise a dict or object to a registered morphological class."""
@@ -316,6 +330,7 @@ def elevate(data: Any, cls: Type) -> object:
     source = cls.__msc_source__
     kwargs = {k: getattr(data, k, data.get(k)) for k in source.__annotations__}
     return cls(**kwargs)
+
 
 class TorusWinding:
     NULL = 0b00  # (0,0) - topological glue
@@ -327,6 +342,7 @@ class TorusWinding:
     def to_str(winding: int) -> str:
         return {0b00: "NULL", 0b01: "W1", 0b10: "W2", 0b11: "W12"}[winding & 0b11]
 
+
 @dataclass
 class SemanticState:
     entropy: float
@@ -337,7 +353,8 @@ class SemanticState:
 
     def __post_init__(self):
         norm = math.sqrt(sum(x * x for x in self.vector))
-        self.vector = [x / norm for x in self.vector] if norm != 0 else self.vector
+        self.vector = [
+            x / norm for x in self.vector] if norm != 0 else self.vector
 
     def measure_coherence(self) -> float:
         return math.sqrt(sum(x * x for x in self.vector))
@@ -347,10 +364,12 @@ class SemanticState:
         self.entropy *= factor
 
     def perturb(self, magnitude: float = 0.01) -> None:
-        self.vector = [(x + random.uniform(-magnitude, magnitude)) for x in self.vector]
+        self.vector = [(x + random.uniform(-magnitude, magnitude))
+                       for x in self.vector]
         norm = math.sqrt(sum(x * x for x in self.vector))
         if norm > 0:
             self.vector = [x / norm for x in self.vector]
+
 
 class MorphologicPyOb:
     entropy: float
@@ -398,7 +417,7 @@ class MorphologicPyOb:
             out = seq[:idx] + self.rhs + seq[idx+1:]
             self._state = QState.ENTANGLED
         return out
-    
+
     def collapse(self) -> Any:
         if self._state != QState.COLLAPSED:
             if self._state == QState.SUPERPOSITION and self._super:
@@ -427,9 +446,12 @@ class MorphologicPyOb:
         self.memory['executions'] = self.memory.get('executions', 0) + 1
 
 # --- ByteWord Representation ---
+
+
 @dataclass
 class ByteWord:
     raw: int
+
     def __init__(self, raw: int):
         if not 0 <= raw <= 0xFF:
             raise ValueError("ByteWord must be 0-255")
@@ -437,9 +459,10 @@ class ByteWord:
         self.state = (raw >> 4) & 0x0F
         self.morphism = (raw >> 1) & 0x07
         self.floor = Morphology(raw & 0x01)
-    
+
     def __repr__(self):
         return f"ByteWord(state={self.state}, morph={self.morphism}, floor={self.floor})"
+
     @property
     def control(self) -> int:
         return (self.raw >> 7) & 0x1
@@ -495,6 +518,7 @@ class ByteWord:
         return hashlib.sha256(bytes([self.raw])).digest()
 # --- CPythonFrame for Runtime Tracking ---
 
+
 @dataclass
 class CPythonFrame:
     type_ptr: int
@@ -503,14 +527,14 @@ class CPythonFrame:
     refcount: int = field(default=1)
     ttl: Optional[int] = None
     state: QState = field(init=False, default=QState.SUPERPOSITION)
-    
+
     def __post_init__(self):
         self._birth = time.time()
         if self.ttl:
             self._expiry = self._birth + self.ttl
         else:
             self._expiry = None
-    
+
     @classmethod
     def from_object(cls, obj: Any) -> 'CPythonFrame':
         return cls(
@@ -519,46 +543,12 @@ class CPythonFrame:
             value=obj,
             refcount=sys.getrefcount(obj)-1
         )
-    
+
     def collapse(self) -> Any:
         self.state = QState.COLLAPSED
         return self.value
 
-@dataclass
-class SemanticState:
-    entropy: float
-    trigger_threshold: float
-    memory: dict
-    signature: str
-    vector: List[float]
 
-    def __post_init__(self):
-        norm = math.sqrt(sum(x * x for x in self.vector))
-        self.vector = [x / norm for x in self.vector] if norm != 0 else self.vector
-
-    def measure_coherence(self) -> float:
-        return math.sqrt(sum(x * x for x in self.vector))
-
-    def decay(self, factor: float = 0.99) -> None:
-        self.vector = [x * factor for x in self.vector]
-        self.entropy *= factor
-
-    def perturb(self) -> None:
-        self.vector = self.vector[1:] + [self.vector[0]]
-        self.entropy += 0.01
-
-    def normalize(self) -> None:
-        norm = math.sqrt(sum(x * x for x in self.vector))
-        if norm > 0:
-            self.vector = [x / norm for x in self.vector]
-
-    def coherence(self) -> float:
-        return math.sqrt(sum(x * x for x in self.vector))
-
-    def perturb(self, magnitude: float) -> None:
-        """Apply entropy perturbation."""
-        self.vector = [(x + random.uniform(-magnitude, magnitude)) for x in self.vector]
-        self.normalize()
 class ALU:
     def __init__(self, size: int = 8):
         self.registers = [ByteWord(0) for _ in range(size)]
@@ -571,7 +561,8 @@ class ALU:
         if a.is_null or b.is_null:
             result = ByteWord(a.raw if b.is_null else b.raw)
         else:
-            result = ByteWord((a.raw & 0xF8) | ((a.value + b.value) & 0x7) << 4 | a.topology)
+            result = ByteWord((a.raw & 0xF8) | (
+                (a.value + b.value) & 0x7) << 4 | a.topology)
         self.registers[dest] = result
         self.history.append(result)
         self.state.perturb()
@@ -581,7 +572,8 @@ class ALU:
         if not self.registers[null_reg].is_null:
             return
         ptr = self.registers[ptr_reg]
-        self.registers[ptr_reg] = ByteWord((1 << 7) | (ptr.value << 4) | ptr.topology)
+        self.registers[ptr_reg] = ByteWord(
+            (1 << 7) | (ptr.value << 4) | ptr.topology)
         self.history.append(self.registers[ptr_reg])
         self.state.perturb()
 
@@ -612,7 +604,7 @@ class ALU:
     def toroidal_laplacian(self) -> List[int]:
         field = self.morphic_field()
         n = len(field)
-        return [field[(i-1)%n] + field[(i+1)%n] - 2*field[i] for i in range(n)]
+        return [field[(i-1) % n] + field[(i+1) % n] - 2*field[i] for i in range(n)]
 
     def heat_morph_step(self) -> None:
         lap = self.toroidal_laplacian()
@@ -647,12 +639,15 @@ class ALU:
 
     def is_oracle(self, state: Tuple[ByteWord, List[ByteWord]]) -> bool:
         return TorusWinding.to_str(state[0].winding) != "NULL"
+
+
 def next_traversal_index(alu: ALU, current: int) -> int:
     """Compute next index based on winding."""
     winding = alu.registers[current].winding
-    step = {TorusWinding.NULL: 1, TorusWinding.W1: 1, 
+    step = {TorusWinding.NULL: 1, TorusWinding.W1: 1,
             TorusWinding.W2: 2, TorusWinding.W12: 3}[winding]
     return (current + step) % len(alu.registers)
+
 
 def torus_trajectory(alu: ALU, steps: int) -> List[int]:
     """Generate traversal trajectory."""
@@ -661,14 +656,6 @@ def torus_trajectory(alu: ALU, steps: int) -> List[int]:
         trajectory.append(next_traversal_index(alu, trajectory[-1]))
     return trajectory
 
-def detect_cycle(trajectory: List[int]) -> int:
-    """Detect cycle length in trajectory."""
-    seen = {}
-    for i, idx in enumerate(trajectory):
-        if idx in seen:
-            return i - seen[idx]
-        seen[idx] = i
-    return 0  # No cycle found
 
 def detect_cycle(trajectory: List[int]) -> int:
     """Detect cycle length in trajectory."""
@@ -678,6 +665,18 @@ def detect_cycle(trajectory: List[int]) -> int:
             return i - seen[idx]
         seen[idx] = i
     return 0  # No cycle found
+
+
+def detect_cycle(trajectory: List[int]) -> int:
+    """Detect cycle length in trajectory."""
+    seen = {}
+    for i, idx in enumerate(trajectory):
+        if idx in seen:
+            return i - seen[idx]
+        seen[idx] = i
+    return 0  # No cycle found
+
+
 class MSCDSL:
     def __init__(self, alu: ALU):
         self.alu = alu
@@ -702,7 +701,8 @@ class MSCDSL:
     def _load(self, args: List[str]) -> None:
         reg, value = args[0].split("=")
         reg = self._parse_reg(reg.strip())
-        value = eval(value.strip())  # Dangerous, replace with safer parsing in production
+        # Dangerous, replace with safer parsing in production
+        value = eval(value.strip())
         self.alu.registers[reg] = value
 
     def _deputize(self, args: List[str]) -> None:
@@ -775,6 +775,8 @@ class MSCDSL:
                 raise ValueError(f"Unknown command: {cmd}")
 
 # QuineTransducer for self-modifying DSL
+
+
 class QuineTransducer:
     def __init__(self, dsl: MSCDSL):
         self.dsl = dsl
@@ -790,7 +792,8 @@ class QuineTransducer:
         self.transformation_history.append(new_source)
         namespace = {}
         exec(new_source, namespace)
-        self.dsl.commands["PROGRAM"] = lambda _: namespace["msc_program"](self.dsl.alu)
+        self.dsl.commands["PROGRAM"] = lambda _: namespace["msc_program"](
+            self.dsl.alu)
         self._current_source = new_source
 
     def _generate_new_source(self, code: str) -> str:
@@ -807,6 +810,7 @@ class QuineTransducer:
     @property
     def source(self) -> str:
         return self._current_source
+
 
 """
 # Glossary for fast integration + 'squaring' of smooth cognitive functions in Morphological Source Code
@@ -1050,6 +1054,8 @@ Encoding Landauer's Principle in Binary
     Energy Cost: k_B T ln 2
     ```
 """
+
+
 def aluTest():
 
     # Test the DSL
@@ -1081,23 +1087,22 @@ def aluTest():
     print("Transduced source:")
     print(transducer.source)
 
+
 if __name__ == "__main__":
     mc = MorphicComplex(1, 2)
     print(mc, mc.conjugate(), mc*mc)
     bw = ByteWord(0b10110010)
     print(bw)
 
-
-
     mp = MorphologicPyOb(
         entropy=1.0,
         trigger_threshold=0.5,
         memory={"init": True},
         signature="abc123",
-        #state=state
+        # state=state
     )
 
-    cf = CPythonFrame.from_object([1,2,3])
+    cf = CPythonFrame.from_object([1, 2, 3])
     print(cf, cf.collapse())
 
 aluTest()
