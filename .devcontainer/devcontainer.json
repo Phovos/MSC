@@ -1,0 +1,32 @@
+{
+    "name": "Py 3.13 with Jupyter, nox and uv.",
+    "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "editor.formatOnSave": true,
+                "python.pythonPath": "~/.pyenv/versions/3.13.0/bin/python",
+                "python.linting.enabled": true,
+                "python.linting.ruffEnabled": true,
+                "editor.defaultFormatter": "ms-python.vscode-pylance"
+            },
+            // can't auto-install, but these will prompt you to stall yourself, automatically.
+            "extensions": [
+                "ms-python.python",
+                "ms-python.debugpy",
+                "ms-python.vscode-pylance",
+                "perras.UV",
+                "eamodio.gitlens"
+            ]
+        }
+    },
+    "onCreateCommand": "if [ \"$CODESPACES\" = \"true\" ]; then echo 'In Codespaces: Running minimal setup'; else bash .devcontainer/provisioning.sh; fi || true",
+    "postCreateCommand": "bash .devcontainer/provisioning.sh && bash .devcontainer/setup.sh && cp .devcontainer/.bashrc ~/.bashrc && source ~/.bashrc && curl -LsSf https://astral.sh/uv/install.sh | sh && uv venv .venv && source .venv/bin/activate && uv pip install -U jupyterlab nox",
+    "postStartCommand": "source .venv/bin/activate && jupyter-lab --ip=0.0.0.0 --no-browser --allow-root",
+    "forwardPorts": [8000, 8888, 8341],
+    "runArgs": ["--network=host"],
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+    "remoteUser": "vscode"
+}
