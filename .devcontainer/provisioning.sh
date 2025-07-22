@@ -3,12 +3,11 @@ FILE=$1
 
 echo "Initializing Python bridge..."
 
-# Extract version using a Python script
-version=$(python3 appBridge.py)
-
-if [ -z "$version" ]; then
-  echo "Error: Version not found in pyproject.toml."
-  exit 1
+if [ -f "./scripts/appBridge.py" ] && [ -f "pyproject.toml" ]; then
+  VERSION=$(python3 ./scripts/appBridge.py)
+  echo "Detected version: $VERSION"
+else
+  echo "[WARN] pyproject.toml or appBridge.py not found. Skipping version extraction."
 fi
 
 echo "[PYTHON] Sending version $version to Python"

@@ -46,8 +46,8 @@
     }
   },
   "onCreateCommand": "if [ \"$CODESPACES\" = \"true\" ]; then echo 'In Codespaces: Running minimal setup'; else bash .devcontainer/provisioning.sh; fi || true",
-  "postCreateCommand": "bash .devcontainer/provisioning.sh && bash .devcontainer/setup.sh && uv venv .venv && uv pip install -U jupyterlab nox",
-  "postStartCommand": ". .venv/bin/activate && jupyter-lab --ip=0.0.0.0 --no-browser --allow-root",
+  "postCreateCommand": "uv venv .venv && uv pip install -U jupyterlab nox",
+  "postStartCommand": "bash .devcontainer/provisioning.sh && bash .devcontainer/setup.sh",
   "forwardPorts": [8000, 8888, 8341],
   "runArgs": ["--network=host"],
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
