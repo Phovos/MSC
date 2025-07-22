@@ -1,0 +1,63 @@
+[project]
+name = "MSC"
+description = "MSC: Morphological Source Code; semantic integration, syntax-lowering, & more."
+authors = [{ name = "PHOVOS", email = "PHOVOS@outlook.com" }]
+requires-python = ">=3.13"
+version = "0.0.12"
+readme = { file = "README.md", content-type = "text/markdown" }
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "ruff",
+    "mypy",
+    "nox",
+    "pre-commit",
+    "jupyterlab",
+]
+
+[project.scripts]
+setup = "pip install -e .[dev]"
+lint = "ruff ."
+format = { composite = ["black .", "isort ."] }
+typecheck = "mypy ."
+test = "pytest"
+
+[tool.black]
+line-length = 88
+target-version = ["py313"]
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.scratch
+  | \.nox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+show_error_codes = true
+disallow_untyped_defs = true
+exclude = ["build/", "dist/", ".venv/"]
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "W", "B"]
+exclude = ["build/", "dist/", ".venv/"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+
+[tool.uv.workspace]
+members = ["packages/*"]
+exclude = ["packages/seeds"]
+
+[tool.uv]
+cache-keys = [{ file = "**/*.toml" }]

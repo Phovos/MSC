@@ -6,7 +6,7 @@
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "bash",
                 "editor.formatOnSave": true,
-                "python.pythonPath": "~/.pyenv/versions/3.13.0/bin/python",
+                "python.pythonPath": "~/.pyenv/versions/3.13.5/bin/python",
                 "python.linting.enabled": true,
                 "python.linting.ruffEnabled": true,
                 "editor.defaultFormatter": "ms-python.vscode-pylance"
@@ -28,5 +28,9 @@
     "runArgs": ["--network=host"],
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-    "remoteUser": "vscode"
-}
+    "remoteUser": "vscode",
+    "features": {
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.13.5"
+        }
+}}
