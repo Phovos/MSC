@@ -403,3 +403,15 @@ bp() {
   fi
 }
 fi
+
+# Initialize uv
+export UV_ROOT="$HOME/.uv"
+[ -f "$UV_ROOT/uv.sh" ] && source "$UV_ROOT/uv.sh"
+
+# Auto-activate or create uv venv
+if [ -f ".venv/bin/activate" ]; then
+  uv use .venv >/dev/null 2>&1
+elif [ -d "$HOME/workspaces/${PWD##*/}/.venv" ]; then
+  uv venv .venv >/dev/null 2>&1
+  uv use .venv >/dev/null 2>&1
+fi
