@@ -1,13 +1,13 @@
 ---
 name: "README.md"
-description: "This is the top-level ![README.md](/README.md)."
-version: "see pyproject.toml for single source of truth"
+description: "This is the root [README.md](/README.md) of the MSC-repo."
+version: "see [pyproject.toml](/pyproject.toml) for single source of truth"
 root: "."
 ---
-# Community:
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Python 3.12+](https://img.shields.io/badge/Python-3.12+-3776AB.svg?logo=python)](https://www.python.org)
 [![Status: Experimental](https://img.shields.io/badge/Status-Experimental-red.svg)](https://github.com/Phovos/MSC)
+# Community:
 
 **Welcome to the root of the Morphological Source Code (MSC) repository!**
 
@@ -15,7 +15,35 @@ root: "."
 
 CommunityLinks: [r/Morphological](https://www.reddit.com/r/Morphological/) | [Phovos(Phovso)@X](https://x.com/Phovso) | [Phovos@youtube](https://www.youtube.com/@phovos) | [MSC gitter(dev-chat)](https://app.gitter.im/#/room/#msc:gitter.im)
 
-Other than the **Golden Rule**; our only other rule for community, contribution, and interaction is to do as thou wilt. We **recommend** both critical and empathic thinking, and, indeed, **urge** grounding in thermodynamic, if no-other, global-shared-realities, beyond, whatever, could be considered-to-be _your own_. We do not anticipate a moral or philosophical means of deviating from this principle becoming realistic in the near-future, but we **will** work to keep you apprised of any changes to such criticality(s) as project: 'ethics', 'epistemological-behavioral-analysis', 'alignment', and the conventional, gauche, concept of the LICENSE (alluded-to above, and throughout).
+Other than the **Golden Rule**; our only other rule for community, contribution, and interaction is to do as thou wilt. We **recommend** both critical and empathic thinking, and, indeed, **urge** grounding in thermodynamic, if no-other, global-shared-realities, beyond, whatever, could be considered-to-be _your own_. We do not anticipate a moral or philosophical means of deviating from this principle becoming realistic in the near-future, but we **will** work to keep you apprised of any changes to such criticality(s) as project: 'ethics', 'epistemological-behavioral-analysis', 'alignment', and the conventional, gauche, concept of the [LICENSE](/LICENSE).
+
+## Best practices:
+
+[[data-is-code]], not just insofar as `.py` files, go. This entire repository is a [[Knowledge-Base]] (Obsidian-MD and PKM inspired). As the codebase matures, these features will be more of a living-schema and morphological/idempotent [[user-interface]] (UI) for the [[SDK]], as a whole. This does not merely pertain to 'documnentation'; you may see the odd vestiges of this evolving-feature in the syntax of my in-`.py` commenting-syntax, like [[Dobule-Brackets]] for proper-nouns and associative KB (Knowledge-Base) entities. The most-relevant heuristics for this 'multiple filetype paradigm', follow:
+- **Syntax Conventions**:
+    - Utilize [[camelCase]] for internal source code
+    - Utilize [[CAPS_CASE]] for [[FFI]] funcs and external source
+    - [[Frontmatter]] for internal documentation (may be hidden by your reader):
+        - Utilize 'frontmatter' to include the title and other `property`, `tag`, etc. in the knowledge base article(s).
+        - For Example (no backticks, but does include 'dashes'):
+
+                ```
+                ---
+                name: "Article Title"
+                link: "[[Related Link]]"
+                linklist:
+                    - "[[Link1]]"
+                    - "[[Link2]]"
+                ---
+                ```
+    - Comment lines, should they exist, count as 'empty lines' insofar as enforcing line breaks between classes, methods, etc. and so no empty line is needed between the end of one class and the start of another class that has a comment line directly above it, or its decorator(s), etc.
+        - We don't dislike comment-lines, matter-of fact we prefer them to a wrapping comment (I'm still tuning and locking-in the correct auto-lint settings, this is not enforced, yet).
+            - The exception to this is [[docstrings]]; stay-tuned, but, docstrings will auto-format to be very strict about such things, and related-ones, insofar as adhering to "__repr__" hygiene, etc.
+                - Docstrings, and source code itself, will need to have sliding register and spare-representation aware syntax and auto-formatting (It sounds absurd, but imagine if a couple of CompoundByteWords have to 'transpose' their own source code (using-themselves; that's a limited line length, to say the least); every facet of the MSC stack would then need to be 'squeezed' through that restricted-ontogeny (morpho-tolology, if you will), never-exceeding the limits of the shape of the recepticle).
+    - To examine [[ruff]] ([[linter]], [[LSP]]) rules and align them with your choices, the following command gives and exhaustive list of all configuration strings; I've heavily customized many things.
+        - Modify your `pyproject.toml` to change the ruff settings:
+            - `ruff rule --all --output-format json | jq '.[] | "\(.code): \(.name) - \(.summary)"'`
+
 
 # Morphological Source Code (MSC):
 
@@ -814,29 +842,3 @@ Alignment Failure: When a computation runs beyond the boundary of its reflective
 "A self-reflective, dissipative system that mirrors its own state, such that its transformation is governed by the anti-Hermitian properties of its computational and thermodynamic operators. It generates an informational (and possibly entropic) state space where the computation evolves in a complex (imaginative) manner, with its own self-referential process being observed but not fixed until the system collapses into a determined output. In short, a quine is like the anti-Hermitian conjugate of a system, but instead of dealing with physical observables and energy states, it reflects on computational states and thermodynamic entropy, feeding back into itself in an unpredictable and non-deterministic way, mirroring its own speculative process until it reaches self-consistency. "
 
 ---
-## Best practices:
-
-[[data-is-code]], not just insofar as `.py` files, go. This entire repository is a [[Knowledge-Base]] (Obsidian-MD and PKM inspired). As the codebase matures, these features will be more of a living-schema and morphological/idempotent [[user-interface]] (UI) for the [[SDK]], as a whole. This does not merely pertain to 'documnentation'; you may see the odd vestiges of this evolving-feature in the syntax of my in-`.py` commenting-syntax, like [[Dobule-Brackets]] for proper-nouns and associative KB (Knowledge-Base) entities. The most-relevant heuristics for this 'multiple filetype paradigm', follow:
-- **Syntax Conventions**:
-    - Utilize [[camelCase]] for internal source code
-    - Utilize [[CAPS_CASE]] for [[FFI]] funcs and external source
-    - [[Frontmatter]] for internal documentation (may be hidden by your reader):
-        - Utilize 'frontmatter' to include the title and other `property`, `tag`, etc. in the knowledge base article(s).
-        - For Example (no backticks, but does include 'dashes'):
-
-                ```
-                ---
-                name: "Article Title"
-                link: "[[Related Link]]"
-                linklist:
-                    - "[[Link1]]"
-                    - "[[Link2]]"
-                ---
-                ```
-    - Comment lines, should they exist, count as 'empty lines' insofar as enforcing line breaks between classes, methods, etc. and so no empty line is needed between the end of one class and the start of another class that has a comment line directly above it, or its decorator(s), etc.
-        - We don't dislike comment-lines, matter-of fact we prefer them to a wrapping comment (I'm still tuning and locking-in the correct auto-lint settings, this is not enforced, yet).
-            - The exception to this is [[docstrings]]; stay-tuned, but, docstrings will auto-format to be very strict about such things, and related-ones, insofar as adhering to "__repr__" hygiene, etc.
-                - Docstrings, and source code itself, will need to have sliding register and spare-representation aware syntax and auto-formatting (It sounds absurd, but imagine if a couple of CompoundByteWords have to 'transpose' their own source code (using-themselves; that's a limited line length, to say the least); every facet of the MSC stack would then need to be 'squeezed' through that restricted-ontogeny (morpho-tolology, if you will), never-exceeding the limits of the shape of the recepticle).
-    - To examine [[ruff]] ([[linter]], [[LSP]]) rules and align them with your choices, the following command gives and exhaustive list of all configuration strings; I've heavily customized many things.
-        - Modify your `pyproject.toml` to change the ruff settings:
-            - `ruff rule --all --output-format json | jq '.[] | "\(.code): \(.name) - \(.summary)"'`
