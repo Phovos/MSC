@@ -124,7 +124,7 @@ class LogAdapter:
     file_level: str = "INFO"
     broadcast_filename: str = "broadcast.log"
     broadcast_level: str = "INFO"
-    queue_size: int = -1  # -1 = infinite
+    queue_size: Optional[int] = None  # Set to -1 for infinite, or a positive int for a sized queue
     correlation_id: str = "SYSTEM"
     LOGGING_CONFIG: dict = field(init=False)
     logger: logging.Logger = field(init=False)
@@ -172,24 +172,31 @@ class LogAdapter:
             },
             'root': {
                 'level': 'INFO',
-                'handlers': ['console', 'file', 'broadcast']
+                # This will be determined by whether a queue is used or not
+                'handlers': [] 
             }
         }
-
+        # The list of handlers that do the actual work (writing to console/file)
+        destination_handlers = ['console', 'file', 'broadcast']
         if self.queue_size is not None:
+            # If a queue is used, configure it and make it the ONLY handler for the root logger.
+            # The QueueHandler itself will then dispatch to the destination handlers.
             self.LOGGING_CONFIG['handlers']['queue'] = {
                 'class': 'logging.handlers.QueueHandler',
-                'level': 'INFO',
-                'formatter': 'default',
-                'queue': multiprocessing.Queue(self.queue_size)
+                # This is the crucial missing piece:
+                'handlers': destination_handlers, 
+                'queue': multiprocessing.Queue(self.queue_size),
             }
-            self.LOGGING_CONFIG['root']['handlers'].append('queue')
+            self.LOGGING_CONFIG['root']['handlers'] = ['queue']
+        else:
+            # If no queue is used, the root logger sends directly to the destination handlers.
+            self.LOGGING_CONFIG['root']['handlers'] = destination_handlers
 
         logging.config.dictConfig(self.LOGGING_CONFIG)
         base_logger = logging.getLogger(__name__)
         self.logger = self.CorrelationLogger(base_logger, {"cid": self.correlation_id})
 
-        self.logger.info("Logger initialized with [console, file, broadcast] handlers.")
+        self.logger.info("Logger initialized.")
 
     class CorrelationLogger(logging.LoggerAdapter):
         def process(self, msg: str, kwargs: Any) -> tuple[str, Any]:
