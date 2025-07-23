@@ -23,24 +23,8 @@ dev = [
 [project.scripts]
 setup = "pip install -e .[dev]"
 lint = "ruff ."
-format = { composite = ["black .", "isort ."] }
 typecheck = "mypy ."
 test = "pytest"
-
-[tool.black]
-line-length = 88
-target-version = ["py313"]
-exclude = '''
-/(
-    \.git
-  | \.mypy_cache
-  | \.scratch
-  | \.nox
-  | \.venv
-  | build
-  | dist
-)/
-'''
 
 [tool.mypy]
 python_version = "3.13"

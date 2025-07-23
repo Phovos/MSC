@@ -4,7 +4,6 @@ from __future__ import annotations
 <https://github.com/Phovos/msc> • MSC: Morphological Source Code © 2025 by Phovos
 Standard Library Imports - 3.13 std libs **ONLY**"""
 import re
-import os
 import sys
 import math
 import enum
@@ -28,7 +27,7 @@ try:
         class WindowsConsole:
             """Enable ANSI escape sequences on Windows consoles."""
             @staticmethod
-            def enable_ansi():
+            def enable_ansi() -> None:
                 STD_OUTPUT_HANDLE = -11
                 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
                 kernel32 = windll.kernel32
@@ -432,7 +431,6 @@ def format_complex_matrix(matrix: List[List[complex]], precision: int = 3) -> st
 
 if __name__ == "__main__":
     import argparse
-    import os
     import re
     def is_valid_semver(version: str) -> bool:
         # Accepts optional leading 'v', e.g. "v1.2.3" or "1.2.3"
