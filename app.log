@@ -37,3 +37,16 @@
 [32mShutting down thread pool executor...[0m
 [32mFile watcher stopped[0m
 [32mAll transports stopped[0m
+[32mFile watcher started with 30s interval[0m
+[32mHTTP server started on 0.0.0.0:8000[0m
+[32mUDP server started on [::1]:9999[0m
+[32mTCP server started on [::1]:9998[0m
+[32mWebSocket server started on [::1]:9997[0m
+[32mAll transports started[0m
+[32mHTTP server shutdown complete[0m
+[32mUDP server shutdown complete[0m
+[32mTCP server shutdown complete[0m
+[32mWebSocket server shutdown complete[0m
+[32mShutting down thread pool executor...[0m
+[32mFile watcher stopped[0m
+[32mAll transports stopped[0m

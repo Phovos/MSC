@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
@@ -17,12 +18,19 @@ import subprocess
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import (
-    Any, Dict, List, Optional, Union, Callable, TypeVar,
-    Type, get_type_hints, get_origin, get_args
+    Any,
+    Dict,
+    List,
+    Optional,
+    Union,
+    Callable,
+    TypeVar,
+    Type,
+    get_type_hints,
+    get_origin,
+    get_args,
 )
-from types import (
-    SimpleNamespace
-)
+from types import SimpleNamespace
 from dataclasses import dataclass, field
 from functools import partial, wraps
 from datetime import datetime
@@ -30,6 +38,7 @@ from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor
+
 """(MSC) Morphological Source Code Framework – V0.0.12
 ================================================================================
 <https://github.com/Phovos/msc> • MSC: Morphological Source Code © 2025 by Phovos
@@ -58,9 +67,11 @@ REPO_ROOT = Path(__file__).parent.parent
 # CONFIGURATION
 # ==========================================================================
 
+
 @dataclass
 class AppConfig:
     """Application configuration."""
+
     root_dir: Path = field(default_factory=Path.cwd)
     log_level: int = logging.INFO
     allowed_extensions: set[str] = field(default_factory=lambda: {'.py', '.txt', '.md'})
@@ -78,9 +89,16 @@ class AppConfig:
     max_content_length: int = 1_000_000
     enable_cors: bool = True
     debug: bool = False
-    thread_pool_size: int = field(default_factory=lambda: int(os.environ.get('APP_THREAD_POOL_SIZE', '4')))
-    enable_security: bool = field(default_factory=lambda: os.environ.get('APP_ENABLE_SECURITY', 'true').lower() == 'true')
-    temp_dir: Path = field(default_factory=lambda: Path(os.environ.get('APP_TEMP_DIR', '/tmp')))
+    thread_pool_size: int = field(
+        default_factory=lambda: int(os.environ.get('APP_THREAD_POOL_SIZE', '4'))
+    )
+    enable_security: bool = field(
+        default_factory=lambda: os.environ.get('APP_ENABLE_SECURITY', 'true').lower()
+        == 'true'
+    )
+    temp_dir: Path = field(
+        default_factory=lambda: Path(os.environ.get('APP_TEMP_DIR', '/tmp'))
+    )
 
     @classmethod
     def from_env(cls) -> 'AppConfig':
@@ -88,7 +106,9 @@ class AppConfig:
         return cls(
             root_dir=Path(os.getenv('APP_ROOT_DIR', str(Path.cwd()))),
             log_level=getattr(logging, os.getenv('APP_LOG_LEVEL', 'INFO')),
-            allowed_extensions=set(os.getenv('APP_ALLOWED_EXTENSIONS', '.py,.txt,.md').split(',')),
+            allowed_extensions=set(
+                os.getenv('APP_ALLOWED_EXTENSIONS', '.py,.txt,.md').split(',')
+            ),
             admin_users=set(os.getenv('APP_ADMIN_USERS', 'admin').split(',')),
             db_connection_string=os.getenv('APP_DB_CONNECTION_STRING'),
             cache_ttl=int(os.getenv('APP_CACHE_TTL', '3600')),
@@ -105,7 +125,7 @@ class AppConfig:
             debug=os.getenv('APP_DEBUG', 'false').lower() == 'true',
             thread_pool_size=int(os.getenv('APP_THREAD_POOL_SIZE', '4')),
             enable_security=os.getenv('APP_ENABLE_SECURITY', 'true').lower() == 'true',
-            temp_dir=Path(os.getenv('APP_TEMP_DIR', '/tmp'))
+            temp_dir=Path(os.getenv('APP_TEMP_DIR', '/tmp')),
         )
 
     @classmethod
@@ -134,18 +154,21 @@ class AppConfig:
         with open(path, 'w') as f:
             json.dump(self.to_dict(), f, indent=2)
 
+
 # ==========================================================================
 # LOGGING
 # ==========================================================================
 
+
 class ThreadSafeFormatter(logging.Formatter):
     """Thread-safe formatter with color support."""
+
     COLORS = {
-        logging.DEBUG: "\x1b[36m",     # Cyan
-        logging.INFO: "\x1b[32m",      # Green
-        logging.WARNING: "\x1b[33m",   # Yellow
-        logging.ERROR: "\x1b[31m",     # Red
-        logging.CRITICAL: "\x1b[31;1m" # Bold red
+        logging.DEBUG: "\x1b[36m",  # Cyan
+        logging.INFO: "\x1b[32m",  # Green
+        logging.WARNING: "\x1b[33m",  # Yellow
+        logging.ERROR: "\x1b[31m",  # Red
+        logging.CRITICAL: "\x1b[31;1m",  # Bold red
     }
     RESET = "\x1b[0m"
     FORMAT = "%(asctime)s - [%(threadName)s] - %(name)s - %(levelname)s - %(message)s"
@@ -164,26 +187,34 @@ class ThreadSafeFormatter(logging.Formatter):
                 'function': record.funcName,
                 'line': record.lineno,
                 'thread': record.thread,
-                'thread_name': record.threadName
+                'thread_name': record.threadName,
             }
             for key, value in record.__dict__.items():
-                if key not in log_data and not key.startswith('_') and isinstance(value, (str, int, float, bool, type(None))):
+                if (
+                    key not in log_data
+                    and not key.startswith('_')
+                    and isinstance(value, (str, int, float, bool, type(None)))
+                ):
                     log_data[key] = value
             return json.dumps(log_data)
         message = super().format(record)
         color = self.COLORS.get(record.levelno, "")
         return f"{color}{message}{self.RESET}" if color else message
 
+
 class AppLogger(logging.Logger):
     """Enhanced logger with structured logging support."""
+
     def structured(self, level, msg, *args, **kwargs):
         extra = kwargs.pop('extra', {}) or {}
         extra['structured'] = True
         kwargs['extra'] = extra
         self.log(level, msg, *args, **kwargs)
 
+
 class LogFilter(logging.Filter):
     """Filter to exclude specific log patterns."""
+
     def __init__(self, exclude_patterns: List[str] = None):
         super().__init__()
         self.exclude_patterns = exclude_patterns or []
@@ -191,6 +222,7 @@ class LogFilter(logging.Filter):
     def filter(self, record):
         message = record.getMessage()
         return not any(pattern in message for pattern in self.exclude_patterns)
+
 
 def setup_logging(config: AppConfig) -> logging.Logger:
     """Configure application logging."""
@@ -205,11 +237,15 @@ def setup_logging(config: AppConfig) -> logging.Logger:
     if config.environment != "development":
         logs_dir = config.root_dir / "logs"
         logs_dir.mkdir(exist_ok=True)
-        fh = logging.FileHandler(logs_dir / f"app-{datetime.now().strftime('%Y%m%d')}.log")
+        fh = logging.FileHandler(
+            logs_dir / f"app-{datetime.now().strftime('%Y%m%d')}.log"
+        )
         fh.setLevel(logging.ERROR)
-        fh.setFormatter(logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(correlation_id)s - %(message)s'
-        ))
+        fh.setFormatter(
+            logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(correlation_id)s - %(message)s'
+            )
+        )
         logger.addHandler(fh)
     else:
         log_file = config.root_dir / "app.log"
@@ -224,12 +260,15 @@ def setup_logging(config: AppConfig) -> logging.Logger:
     logger.addHandler(ch)
     return logger
 
+
 # ==========================================================================
 # METRICS
 # ==========================================================================
 
+
 class PerformanceMetrics:
     """Track and report performance metrics."""
+
     def __init__(self):
         self._metrics = {}
         self._lock = threading.RLock()
@@ -244,23 +283,36 @@ class PerformanceMetrics:
             duration = time.time() - start_time
             with self._lock:
                 if operation_name not in self._metrics:
-                    self._metrics[operation_name] = {'count': 0, 'total_time': 0, 'min_time': float('inf'), 'max_time': 0}
+                    self._metrics[operation_name] = {
+                        'count': 0,
+                        'total_time': 0,
+                        'min_time': float('inf'),
+                        'max_time': 0,
+                    }
                 self._metrics[operation_name]['count'] += 1
                 self._metrics[operation_name]['total_time'] += duration
-                self._metrics[operation_name]['min_time'] = min(self._metrics[operation_name]['min_time'], duration)
-                self._metrics[operation_name]['max_time'] = max(self._metrics[operation_name]['max_time'], duration)
+                self._metrics[operation_name]['min_time'] = min(
+                    self._metrics[operation_name]['min_time'], duration
+                )
+                self._metrics[operation_name]['max_time'] = max(
+                    self._metrics[operation_name]['max_time'], duration
+                )
 
     def get_report(self) -> Dict[str, Dict[str, float]]:
         """Get performance metrics report."""
         with self._lock:
             report = {}
             for op_name, stats in self._metrics.items():
-                avg_time = stats['total_time'] / stats['count'] if stats['count'] > 0 else 0
+                avg_time = (
+                    stats['total_time'] / stats['count'] if stats['count'] > 0 else 0
+                )
                 report[op_name] = {
                     'count': stats['count'],
                     'avg_time': avg_time,
-                    'min_time': stats['min_time'] if stats['min_time'] != float('inf') else 0,
-                    'max_time': stats['max_time']
+                    'min_time': stats['min_time']
+                    if stats['min_time'] != float('inf')
+                    else 0,
+                    'max_time': stats['max_time'],
                 }
             return report
 
@@ -269,66 +321,93 @@ class PerformanceMetrics:
         with self._lock:
             self._metrics = {}
 
+
 # Global performance metrics instance
 performance_metrics = PerformanceMetrics()
 
+
 def measure_performance(func):
     """Decorator to measure function performance."""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         with performance_metrics.measure(func.__qualname__):
             return func(*args, **kwargs)
+
     return wrapper
+
 
 # ==========================================================================
 # ERRORS
 # ==========================================================================
 
+
 class AppError(Exception):
     """Base exception for application errors."""
-    def __init__(self, message: str, error_code: str = "APP_ERROR", status_code: int = 420):
+
+    def __init__(
+        self, message: str, error_code: str = "APP_ERROR", status_code: int = 420
+    ):
         self.message = message
         self.status_code = status_code
         self.error_code = error_code
         self.timestamp = datetime.now()
         super().__init__(message)
 
+
 class ConfigError(AppError):
     """Configuration related errors."""
+
     def __init__(self, message: str):
         super().__init__(message, "CONFIG_ERROR", 500)
 
+
 class SecurityError(AppError):
     """Security related errors."""
+
     def __init__(self, message: str):
         super().__init__(message, "SECURITY_ERROR", 403)
 
+
 class ContentError(AppError):
     """Content related errors."""
+
     def __init__(self, message: str):
         super().__init__(message, "CONTENT_ERROR", 400)
 
+
 def error_handler(logger):
     """Decorator for standardized error handling."""
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
             except AppError as e:
-                logger.error(f"{e.__class__.__name__}: {e.message}", 
-                            exc_info=True, 
-                            extra={'status_code': e.status_code})
+                logger.error(
+                    f"{e.__class__.__name__}: {e.message}",
+                    exc_info=True,
+                    extra={'status_code': e.status_code},
+                )
                 raise
             except Exception as e:
                 logger.error(f"Unexpected error: {str(e)}", exc_info=True)
                 raise AppError(f"An unexpected error occurred: {str(e)}")
+
         return wrapper
+
     return decorator
 
-def retry(max_attempts: int = 3, backoff_factor: float = 1.5, 
-          exceptions: tuple = (Exception,), logger: Optional[logging.Logger] = None):
+
+def retry(
+    max_attempts: int = 3,
+    backoff_factor: float = 1.5,
+    exceptions: tuple = (Exception,),
+    logger: Optional[logging.Logger] = None,
+):
     """Decorator to retry functions with exponential backoff."""
+
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         def wrapper(*args, **kwargs) -> Any:
@@ -347,12 +426,16 @@ def retry(max_attempts: int = 3, backoff_factor: float = 1.5,
                         raise
                     time.sleep(wait_time)
                     attempt += 1
+
         return wrapper
+
     return decorator
+
 
 # ==========================================================================
 # SECURITY
 # ==========================================================================
+
 
 class AccessLevel(Enum):
     READ = 1
@@ -365,9 +448,11 @@ class AccessLevel(Enum):
             return self.value >= other.value
         return NotImplemented
 
+
 @dataclass
 class AccessPolicy:
     """Defines access control policies with pattern matching."""
+
     level: AccessLevel
     namespace_patterns: List[str] = field(default_factory=list)
     allowed_operations: set[str] = field(default_factory=set)
@@ -404,8 +489,10 @@ class AccessPolicy:
             return True
         return namespace == pattern
 
+
 class SecurityContext:
     """Manages security context with audit trail."""
+
     def __init__(self, user_id: str, access_policy: AccessPolicy, logger=None):
         self.user_id = user_id
         self.access_policy = access_policy
@@ -436,7 +523,7 @@ class SecurityContext:
             "user": self.user_id,
             "namespace": namespace,
             "operation": operation,
-            "success": success
+            "success": success,
         }
         with self._lock:
             self._audit_log.append(entry)
@@ -450,11 +537,14 @@ class SecurityContext:
                         'user_id': self.user_id,
                         'namespace': namespace,
                         'operation': operation,
-                        'success': success
-                    }
+                        'success': success,
+                    },
                 )
-            if (len(self._audit_log) > 1000 or 
-                (datetime.now() - self._last_audit_flush).total_seconds() > self._audit_flush_interval):
+            if (
+                len(self._audit_log) > 1000
+                or (datetime.now() - self._last_audit_flush).total_seconds()
+                > self._audit_flush_interval
+            ):
                 self._flush_audit_log()
 
     def _flush_audit_log(self):
@@ -464,9 +554,11 @@ class SecurityContext:
                 self._audit_log = self._audit_log[-1000:]
             self._last_audit_flush = datetime.now()
 
+
 # ==========================================================================
 # CONTENT MANAGEMENT
 # ==========================================================================
+
 
 @dataclass
 class FileMetadata:
@@ -491,19 +583,24 @@ class FileMetadata:
         result['modified'] = self.modified.isoformat()
         return result
 
+
 class ContentChangeEvent(Enum):
     CREATED = "created"
     MODIFIED = "modified"
     DELETED = "deleted"
 
+
 class ContentObserver:
     """Interface for content change observers."""
+
     def notify(self, event: ContentChangeEvent, metadata: FileMetadata) -> None:
         """Handle content change notification."""
         pass
 
+
 class ContentCache:
     """LRU cache for file content with TTL support."""
+
     def __init__(self, max_size: int = 100, ttl: int = 3600):
         self.max_size = max_size
         self.ttl = ttl
@@ -541,8 +638,10 @@ class ContentCache:
         with self._lock:
             self._cache.clear()
 
+
 class ContentManager:
     """Manages file content with caching and metadata tracking."""
+
     def __init__(self, config: AppConfig, logger=None):
         self.root_dir = config.root_dir
         self.allowed_extensions = config.allowed_extensions
@@ -561,7 +660,9 @@ class ContentManager:
         with self._lock:
             self.observers.append(observer)
 
-    def notify_observers(self, event: ContentChangeEvent, metadata: FileMetadata) -> None:
+    def notify_observers(
+        self, event: ContentChangeEvent, metadata: FileMetadata
+    ) -> None:
         for observer in self.observers:
             try:
                 observer.notify(event, metadata)
@@ -599,14 +700,23 @@ class ContentManager:
                     raise ContentError(f"Not a file: {path}")
                 stat = path.stat()
                 if stat.st_size > self.max_file_size:
-                    raise ContentError(f"File exceeds maximum size ({self.max_file_size} bytes): {path}")
-                mime_type = 'text/plain' if path.suffix in {'.py', '.txt', '.md'} else 'application/octet-stream'
+                    raise ContentError(
+                        f"File exceeds maximum size ({self.max_file_size} bytes): {path}"
+                    )
+                mime_type = (
+                    'text/plain'
+                    if path.suffix in {'.py', '.txt', '.md'}
+                    else 'application/octet-stream'
+                )
                 symlinks = [
-                    p for p in path.parent.glob('*')
+                    p
+                    for p in path.parent.glob('*')
                     if p.is_symlink() and p.resolve() == path
                 ]
                 is_valid = path.suffix in self.allowed_extensions
-                validation_errors = [] if is_valid else [f"Unsupported file extension: {path.suffix}"]
+                validation_errors = (
+                    [] if is_valid else [f"Unsupported file extension: {path.suffix}"]
+                )
                 metadata = FileMetadata(
                     path=path,
                     mime_type=mime_type,
@@ -616,7 +726,7 @@ class ContentManager:
                     content_hash=self.compute_hash(path),
                     symlinks=symlinks,
                     is_valid=is_valid,
-                    validation_errors=validation_errors
+                    validation_errors=validation_errors,
                 )
                 self.metadata_cache.set(cache_key, metadata)
                 self._file_watchers[path] = time.time()
@@ -626,7 +736,9 @@ class ContentManager:
                 raise e
             except Exception as e:
                 if self.logger:
-                    self.logger.error(f"Failed to get metadata for {path}: {e}", exc_info=True)
+                    self.logger.error(
+                        f"Failed to get metadata for {path}: {e}", exc_info=True
+                    )
                 raise ContentError(f"Failed to get metadata for {path}: {e}")
 
     @measure_performance
@@ -645,11 +757,15 @@ class ContentManager:
                 metadata = self.get_metadata(path)
                 if not metadata.is_valid:
                     if self.logger:
-                        self.logger.warning(f"Skipping invalid file: {path}, errors: {metadata.validation_errors}")
-                    return None   
+                        self.logger.warning(
+                            f"Skipping invalid file: {path}, errors: {metadata.validation_errors}"
+                        )
+                    return None
                 module_name = f"content_{path.stem}"
                 if path.suffix == '.py':
-                    spec = importlib.util.spec_from_file_location(module_name, str(path))
+                    spec = importlib.util.spec_from_file_location(
+                        module_name, str(path)
+                    )
                     if spec and spec.loader:
                         module = importlib.util.module_from_spec(spec)
                         module.__metadata__ = metadata
@@ -667,7 +783,9 @@ class ContentManager:
                     return module
             except Exception as e:
                 if self.logger:
-                    self.logger.error(f"Failed to load module {path}: {e}", exc_info=True)
+                    self.logger.error(
+                        f"Failed to load module {path}: {e}", exc_info=True
+                    )
                 return None
 
     @measure_performance
@@ -680,21 +798,29 @@ class ContentManager:
         try:
             metadata = self.get_metadata(path)
             if not metadata.is_valid:
-                raise ContentError(f"Invalid file: {path}, errors: {metadata.validation_errors}")
+                raise ContentError(
+                    f"Invalid file: {path}, errors: {metadata.validation_errors}"
+                )
             content = path.read_text(encoding='utf-8')
             self.content_cache.set(cache_key, content)
             return content
         except UnicodeDecodeError:
             if self.logger:
-                self.logger.warning(f"File appears to be binary, reading as bytes: {path}")
+                self.logger.warning(
+                    f"File appears to be binary, reading as bytes: {path}"
+                )
             return f"[Binary content, size: {path.stat().st_size} bytes]"
         except Exception as e:
             if self.logger:
-                self.logger.error(f"Failed to read content from {path}: {e}", exc_info=True)
+                self.logger.error(
+                    f"Failed to read content from {path}: {e}", exc_info=True
+                )
             raise ContentError(f"Failed to read content from {path}: {e}")
 
     @measure_performance
-    def scan_directory(self, directory: Optional[Path] = None) -> Dict[str, FileMetadata]:
+    def scan_directory(
+        self, directory: Optional[Path] = None
+    ) -> Dict[str, FileMetadata]:
         """Scan directory recursively and cache metadata for valid files."""
         scan_dir = directory or self.root_dir
         results = {}
@@ -712,17 +838,21 @@ class ContentManager:
             return results
         except Exception as e:
             if self.logger:
-                self.logger.error(f"Error scanning directory {scan_dir}: {e}", exc_info=True)
+                self.logger.error(
+                    f"Error scanning directory {scan_dir}: {e}", exc_info=True
+                )
             raise ContentError(f"Error scanning directory {scan_dir}: {e}")
 
     def start_file_watcher(self, interval: int = 30) -> None:
         """Start a background thread to watch for file changes."""
         if self._watcher_thread and self._watcher_thread.is_alive():
             return
+
         def watcher_loop():
             while not self._stop_event.is_set():
                 self._check_file_changes()
                 self._stop_event.wait(interval)
+
         self._stop_event.clear()
         self._watcher_thread = threading.Thread(target=watcher_loop, daemon=True)
         self._watcher_thread.start()
@@ -768,23 +898,30 @@ class ContentManager:
         self.content_cache.invalidate(f"content:{abs_path}")
         self.module_cache.invalidate(abs_path)
 
+
 # ==========================================================================
 # DOMAIN LAYER: BASEMODEL AND VALIDATION FRAMEWORK
 # ==========================================================================
 
+
 def validate(validator: Callable[[Any], None]):
     """Decorator for field validation methods."""
+
     def decorator(fn):
         @wraps(fn)
         def wrapper(self, value):
             validator(value)
             return value
+
         return wrapper
+
     return decorator
+
 
 @dataclass(frozen=True)
 class BaseModel:
     """Enhanced base model with validation and serialization."""
+
     __slots__ = ('__weakref__',)
 
     def __post_init__(self):
@@ -808,12 +945,18 @@ class BaseModel:
     def _validate_type(self, value: Any, expected_type: Any) -> bool:
         """Type validation supporting generics and unions."""
         from typing import get_origin, get_args, Any, Union
+
         if expected_type is Any:
             return True
         origin = get_origin(expected_type)
         if origin is Union:
             args = get_args(expected_type)
-            return any(isinstance(value, arg) if not get_origin(arg) else self._validate_type(value, arg) for arg in args)
+            return any(
+                isinstance(value, arg)
+                if not get_origin(arg)
+                else self._validate_type(value, arg)
+                for arg in args
+            )
         if origin is not None:
             if not isinstance(value, origin):
                 return False
@@ -821,12 +964,16 @@ class BaseModel:
             if origin is list and args:
                 return all(self._validate_type(item, args[0]) for item in value)
             elif origin is dict and len(args) >= 2:
-                return all(self._validate_type(k, args[0]) for k in value.keys()) and all(
-                    self._validate_type(v, args[1]) for v in value.values()
-                )
+                return all(
+                    self._validate_type(k, args[0]) for k in value.keys()
+                ) and all(self._validate_type(v, args[1]) for v in value.values())
             return True
         # Handle non-generic types (e.g., str, int, NoneType)
-        return isinstance(value, expected_type) if isinstance(expected_type, type) else False
+        return (
+            isinstance(value, expected_type)
+            if isinstance(expected_type, type)
+            else False
+        )
 
     def _validate_model(self):
         """Override for model-level validation."""
@@ -890,13 +1037,16 @@ class BaseModel:
                 result[field_obj.name] = value
         return result
 
+
 # ==========================================================================
 # BUSINESS DOMAIN MODELS
 # ==========================================================================
 
+
 @dataclass(frozen=True)
 class CodeRequest(BaseModel):
     """Model for code execution requests."""
+
     instruct: str
     user_id: Optional[str] = None
 
@@ -905,9 +1055,11 @@ class CodeRequest(BaseModel):
         """Ensure instruct is a string."""
         pass
 
+
 @dataclass(frozen=True)
 class CodeResponse(BaseModel):
     """Model for code execution responses."""
+
     status: str
     message: str
     version: Optional[str] = None
@@ -917,17 +1069,21 @@ class CodeResponse(BaseModel):
         """Ensure status is valid."""
         pass
 
+
 @dataclass(frozen=True)
 class FFIRequest(BaseModel):
     """Model for FFI calls."""
+
     library: str
     function: str
     args: List[Any]
     user_id: Optional[str] = None
 
+
 @dataclass(frozen=True)
 class FFIResponse(BaseModel):
     """Model for FFI responses."""
+
     status: str
     result: Optional[Any] = None
     error: Optional[str] = None
@@ -937,15 +1093,19 @@ class FFIResponse(BaseModel):
         """Ensure status is valid."""
         pass
 
+
 @dataclass(frozen=True)
 class MetadataRequest(BaseModel):
     """Model for metadata requests."""
+
     path: str
     user_id: Optional[str] = None
+
 
 @dataclass(frozen=True)
 class MetadataResponse(BaseModel):
     """Model for metadata responses."""
+
     status: str
     metadata: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
@@ -955,12 +1115,15 @@ class MetadataResponse(BaseModel):
         """Ensure status is valid."""
         pass
 
+
 # ==========================================================================
 # TRANSPORT LAYER
 # ==========================================================================
 
+
 class Transport(ABC):
     """Abstract base class for transport protocols."""
+
     def __init__(self, dispatcher: 'JSONRPCDispatcher', config: AppConfig, logger=None):
         self.dispatcher = dispatcher
         self.config = config
@@ -974,8 +1137,10 @@ class Transport(ABC):
     async def stop(self):
         pass
 
+
 class HTTPTransport(Transport):
     """HTTP transport using ThreadingHTTPServer."""
+
     def __init__(self, dispatcher: 'JSONRPCDispatcher', config: AppConfig, logger=None):
         super().__init__(dispatcher, config, logger)
         self.server: Optional[ThreadingHTTPServer] = None
@@ -1013,7 +1178,9 @@ class HTTPTransport(Transport):
 
         def do_GET(self):
             if self.path == '/health':
-                self._send_json_response({"status": "healthy", "timestamp": time.time()})
+                self._send_json_response(
+                    {"status": "healthy", "timestamp": time.time()}
+                )
             elif self.path == '/stats':
                 self._send_json_response(self.outer.dispatcher.get_stats())
             else:
@@ -1035,10 +1202,12 @@ class HTTPTransport(Transport):
                         "jsonrpc": "2.0",
                         "method": "execute_code",
                         "params": request_data,
-                        "id": "1"
+                        "id": "1",
                     }
+
                 async def process_request():
                     return await self.outer.dispatcher.dispatch(request_data)
+
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
                 response = loop.run_until_complete(process_request())
@@ -1050,7 +1219,9 @@ class HTTPTransport(Transport):
                         elif 'error' in response:
                             response = {
                                 "status": "error",
-                                "message": response['error'].get('message', 'Unknown error')
+                                "message": response['error'].get(
+                                    'message', 'Unknown error'
+                                ),
                             }
                     self._send_json_response(response)
                 else:
@@ -1058,11 +1229,16 @@ class HTTPTransport(Transport):
                     self._send_cors_headers()
                     self.end_headers()
             except json.JSONDecodeError:
-                self._send_json_response({
-                    "jsonrpc": "2.0",
-                    "id": None,
-                    "error": JSONRPCError(JSONRPCError.PARSE_ERROR, "Parse error").to_dict()
-                }, 400)
+                self._send_json_response(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": None,
+                        "error": JSONRPCError(
+                            JSONRPCError.PARSE_ERROR, "Parse error"
+                        ).to_dict(),
+                    },
+                    400,
+                )
             except Exception as e:
                 if self.outer.logger:
                     self.outer.logger.error(f"Unhandled error: {e}", exc_info=True)
@@ -1071,18 +1247,23 @@ class HTTPTransport(Transport):
     async def start(self):
         def handler_factory(*args, **kwargs):
             return self.RequestHandler(self, *args, **kwargs)
+
         try:
             self.server = ThreadingHTTPServer(
                 (self.config.host, self.config.port), handler_factory
             )
             self._running = True
+
             def serve_forever():
                 while self._running and not self._shutdown_event.is_set():
                     self.server.handle_request()
+
             serve_thread = threading.Thread(target=serve_forever, daemon=True)
             serve_thread.start()
             if self.logger:
-                self.logger.info(f"HTTP server started on {self.config.host}:{self.config.port}")
+                self.logger.info(
+                    f"HTTP server started on {self.config.host}:{self.config.port}"
+                )
         except Exception as e:
             if self.logger:
                 self.logger.error(f"Failed to start HTTP server: {e}")
@@ -1096,8 +1277,10 @@ class HTTPTransport(Transport):
             if self.logger:
                 self.logger.info("HTTP server shutdown complete")
 
+
 class UDPTransport(Transport):
     """UDP transport for JSON-RPC datagrams."""
+
     def __init__(self, dispatcher: 'JSONRPCDispatcher', config: AppConfig, logger=None):
         super().__init__(dispatcher, config, logger)
         self.sock: Optional[socket.socket] = None
@@ -1137,8 +1320,10 @@ class UDPTransport(Transport):
             if self.logger:
                 self.logger.info("UDP server shutdown complete")
 
+
 class TCPTransport(Transport):
     """TCP transport for JSON-RPC streams."""
+
     def __init__(self, dispatcher: 'JSONRPCDispatcher', config: AppConfig, logger=None):
         super().__init__(dispatcher, config, logger)
         self.server: Optional[socket.socket] = None
@@ -1172,7 +1357,9 @@ class TCPTransport(Transport):
     async def _handle_client(self, client: socket.socket, addr):
         try:
             while self._running:
-                data = await asyncio.get_event_loop().run_in_executor(None, client.recv, 8192)
+                data = await asyncio.get_event_loop().run_in_executor(
+                    None, client.recv, 8192
+                )
                 if not data:
                     break
                 request = json.loads(data.decode('utf-8'))
@@ -1192,8 +1379,10 @@ class TCPTransport(Transport):
             if self.logger:
                 self.logger.info("TCP server shutdown complete")
 
+
 class WebSocketTransport(Transport):
     """WebSocket transport for JSON-RPC."""
+
     def __init__(self, dispatcher: 'JSONRPCDispatcher', config: AppConfig, logger=None):
         super().__init__(dispatcher, config, logger)
         self.server: Optional[socket.socket] = None
@@ -1229,12 +1418,16 @@ class WebSocketTransport(Transport):
     async def _handle_client(self, client: socket.socket, addr):
         try:
             # Handle WebSocket handshake
-            handshake = await asyncio.get_event_loop().run_in_executor(None, client.recv, 8192)
+            handshake = await asyncio.get_event_loop().run_in_executor(
+                None, client.recv, 8192
+            )
             if not self._handle_handshake(client, handshake.decode('utf-8')):
                 client.close()
                 return
             while self._running:
-                data = await asyncio.get_event_loop().run_in_executor(None, partial(client.recv, 8192))
+                data = await asyncio.get_event_loop().run_in_executor(
+                    None, partial(client.recv, 8192)
+                )
                 if not data:
                     break
                 payload = self._decode_websocket_frame(data)
@@ -1243,7 +1436,9 @@ class WebSocketTransport(Transport):
                 request = json.loads(payload.decode('utf-8'))
                 response = await self.dispatcher.dispatch(request)
                 if response:
-                    frame = self._encode_websocket_frame(json.dumps(response).encode('utf-8'))
+                    frame = self._encode_websocket_frame(
+                        json.dumps(response).encode('utf-8')
+                    )
                     client.send(frame)
         except Exception as e:
             if self.logger:
@@ -1266,7 +1461,9 @@ class WebSocketTransport(Transport):
             if not key:
                 return False
             accept_key = base64.b64encode(
-                hashlib.sha1((key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11').encode('utf-8')).digest()
+                hashlib.sha1(
+                    (key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11').encode('utf-8')
+                ).digest()
             ).decode('utf-8')
             response = (
                 "HTTP/1.1 101 Switching Protocols\r\n"
@@ -1319,8 +1516,8 @@ class WebSocketTransport(Transport):
                 mask_offset = 10
             else:
                 mask_offset = 2
-            mask = data[mask_offset:mask_offset+4]
-            payload = data[mask_offset+4:mask_offset+4+payload_len]
+            mask = data[mask_offset : mask_offset + 4]
+            payload = data[mask_offset + 4 : mask_offset + 4 + payload_len]
             if len(payload) != payload_len:
                 return None
             unmasked = bytes(b ^ mask[i % 4] for i, b in enumerate(payload))
@@ -1340,12 +1537,15 @@ class WebSocketTransport(Transport):
             if self.logger:
                 self.logger.info("WebSocket server shutdown complete")
 
+
 # ==========================================================================
 # JSON-RPC DISPATCHER
 # ==========================================================================
 
+
 class JSONRPCError(Exception):
     """JSON-RPC error."""
+
     PARSE_ERROR = -32700
     INVALID_REQUEST = -32600
     METHOD_NOT_FOUND = -32601
@@ -1353,7 +1553,9 @@ class JSONRPCError(Exception):
     INTERNAL_ERROR = -32603
     VALIDATION_ERROR = -32001
 
-    def __init__(self, code: int, message: str, data: Any = None, request_id: Any = None):
+    def __init__(
+        self, code: int, message: str, data: Any = None, request_id: Any = None
+    ):
         self.code = code
         self.message = message
         self.data = data
@@ -1366,9 +1568,11 @@ class JSONRPCError(Exception):
             error["data"] = self.data
         return error
 
+
 @dataclass
 class MethodInfo:
     """Method metadata."""
+
     name: str
     func: Callable
     is_async: bool
@@ -1377,8 +1581,10 @@ class MethodInfo:
     output_model: Optional[Type[BaseModel]] = None
     raw_params: bool = False
 
+
 class JSONRPCDispatcher:
     """JSON-RPC dispatcher."""
+
     def __init__(self, config: AppConfig, logger=None):
         self.config = config
         self.logger = logger
@@ -1433,6 +1639,7 @@ class JSONRPCDispatcher:
             if self.logger:
                 self.logger.info(f"Registered method: {method_name}")
             return func
+
         return decorator
 
     def middleware_handler(self, func: Callable):
@@ -1465,23 +1672,37 @@ class JSONRPCDispatcher:
             return result
         except Exception as e:
             if self.logger:
-                self.logger.warning(f"Response validation failed for {method_info.name}: {e}")
+                self.logger.warning(
+                    f"Response validation failed for {method_info.name}: {e}"
+                )
             return result
 
     async def _call_method(self, method_info: MethodInfo, params: Any) -> Any:
         try:
             processed_params = await self._prepare_params(method_info, params)
             # Apply security checks
-            if self.config.enable_security and isinstance(processed_params, (CodeRequest, FFIRequest, MetadataRequest)):
+            if self.config.enable_security and isinstance(
+                processed_params, (CodeRequest, FFIRequest, MetadataRequest)
+            ):
                 user_id = processed_params.user_id or 'anonymous'
                 if user_id not in self.security_contexts:
                     policy = AccessPolicy(
-                        level=AccessLevel.ADMIN if user_id in self.config.admin_users else AccessLevel.READ,
-                        namespace_patterns=["*"] if user_id in self.config.admin_users else ["public.*"],
-                        allowed_operations={"read", "write", "execute"} if user_id in self.config.admin_users else {"read"}
+                        level=AccessLevel.ADMIN
+                        if user_id in self.config.admin_users
+                        else AccessLevel.READ,
+                        namespace_patterns=["*"]
+                        if user_id in self.config.admin_users
+                        else ["public.*"],
+                        allowed_operations={"read", "write", "execute"}
+                        if user_id in self.config.admin_users
+                        else {"read"},
                     )
-                    self.security_contexts[user_id] = SecurityContext(user_id, policy, self.logger)
-                self.security_contexts[user_id].enforce_access(method_info.name, "execute")
+                    self.security_contexts[user_id] = SecurityContext(
+                        user_id, policy, self.logger
+                    )
+                self.security_contexts[user_id].enforce_access(
+                    method_info.name, "execute"
+                )
             if method_info.is_async:
                 result = await method_info.func(processed_params)
             else:
@@ -1496,21 +1717,29 @@ class JSONRPCDispatcher:
             raise JSONRPCError(
                 JSONRPCError.VALIDATION_ERROR,
                 f"Security error: {e}",
-                {"method": method_info.name, "error": str(e)} if self.config.debug else None
+                {"method": method_info.name, "error": str(e)}
+                if self.config.debug
+                else None,
             )
         except Exception as e:
             raise JSONRPCError(
                 JSONRPCError.INTERNAL_ERROR,
                 f"Method execution failed: {e}",
-                {"method": method_info.name, "error": str(e)} if self.config.debug else None,
+                {"method": method_info.name, "error": str(e)}
+                if self.config.debug
+                else None,
             )
 
-    async def dispatch_single(self, request_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    async def dispatch_single(
+        self, request_data: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
         start_time = time.time()
         request_id = request_data.get("id")
         try:
             if request_data.get("jsonrpc") != "2.0":
-                raise JSONRPCError(JSONRPCError.INVALID_REQUEST, "Invalid JSON-RPC version")
+                raise JSONRPCError(
+                    JSONRPCError.INVALID_REQUEST, "Invalid JSON-RPC version"
+                )
             method_name = request_data.get("method")
             if not method_name:
                 raise JSONRPCError(JSONRPCError.INVALID_REQUEST, "Missing method")
@@ -1526,15 +1755,11 @@ class JSONRPCDispatcher:
             execution_time = (time.time() - start_time) * 1000
             if request_id is not None:
                 if isinstance(result, dict) and 'status' in result:
-                    return {
-                        "jsonrpc": "2.0",
-                        "id": request_id,
-                        "result": result
-                    }
+                    return {"jsonrpc": "2.0", "id": request_id, "result": result}
                 return {
                     "jsonrpc": "2.0",
                     "id": request_id,
-                    "result": {"status": "success", "message": str(result)}
+                    "result": {"status": "success", "message": str(result)},
                 }
             return None
         except JSONRPCError as e:
@@ -1548,7 +1773,9 @@ class JSONRPCDispatcher:
         try:
             if isinstance(payload, list):
                 if not payload:
-                    raise JSONRPCError(JSONRPCError.INVALID_REQUEST, "Empty batch request")
+                    raise JSONRPCError(
+                        JSONRPCError.INVALID_REQUEST, "Empty batch request"
+                    )
                 results = await asyncio.gather(
                     *[self.dispatch_single(req) for req in payload],
                     return_exceptions=False,
@@ -1563,7 +1790,9 @@ class JSONRPCDispatcher:
             return {
                 "jsonrpc": "2.0",
                 "id": None,
-                "error": JSONRPCError(JSONRPCError.PARSE_ERROR, "Parse error").to_dict(),
+                "error": JSONRPCError(
+                    JSONRPCError.PARSE_ERROR, "Parse error"
+                ).to_dict(),
             }
 
     def get_stats(self) -> Dict[str, Any]:
@@ -1571,8 +1800,10 @@ class JSONRPCDispatcher:
             "methods_registered": len(self.methods),
             "requests_processed": self.request_count,
             "errors_encountered": self.error_count,
-            "active_threads": len(self.executor._threads) if self.executor._threads else 0,
-            "performance_metrics": performance_metrics.get_report()
+            "active_threads": len(self.executor._threads)
+            if self.executor._threads
+            else 0,
+            "performance_metrics": performance_metrics.get_report(),
         }
 
     def shutdown(self):
@@ -1580,9 +1811,11 @@ class JSONRPCDispatcher:
             self.logger.info("Shutting down thread pool executor...")
         self.executor.shutdown(wait=True)
 
+
 # ==========================================================================
 # SERVER SETUP
 # ==========================================================================
+
 
 class JSONRPCServer:
     def __init__(self, config: Optional[AppConfig] = None):
@@ -1631,6 +1864,7 @@ class JSONRPCServer:
         finally:
             await self.stop()
 
+
 def create_server() -> JSONRPCServer:
     config = AppConfig(port=8000, debug=True)
     server = JSONRPCServer(config)
@@ -1647,7 +1881,7 @@ def create_server() -> JSONRPCServer:
                 capture_output=True,
                 text=True,
                 timeout=5,
-                cwd=REPO_ROOT
+                cwd=REPO_ROOT,
             )
             version_file = REPO_ROOT / 'server' / 'version.json'
             version = None
@@ -1658,7 +1892,7 @@ def create_server() -> JSONRPCServer:
             return CodeResponse(
                 status='success' if result.returncode == 0 else 'error',
                 message=result.stdout if result.returncode == 0 else result.stderr,
-                version=version
+                version=version,
             )
         except Exception as e:
             return CodeResponse(status='error', message=str(e), version=version)
@@ -1673,13 +1907,21 @@ def create_server() -> JSONRPCServer:
                 if request.function == 'printf':
                     libc.printf.argtypes = [ctypes.c_char_p]
                     libc.printf.restype = ctypes.c_int
-                    arg = request.args[0].encode('utf-8') if request.args else b"Hello from FFI\n"
+                    arg = (
+                        request.args[0].encode('utf-8')
+                        if request.args
+                        else b"Hello from FFI\n"
+                    )
                     result = libc.printf(arg)
                     return FFIResponse(status='success', result=result)
                 else:
-                    return FFIResponse(status='error', error=f"Unknown function: {request.function}")
+                    return FFIResponse(
+                        status='error', error=f"Unknown function: {request.function}"
+                    )
             else:
-                return FFIResponse(status='error', error=f"Unknown library: {request.library}")
+                return FFIResponse(
+                    status='error', error=f"Unknown library: {request.library}"
+                )
         except Exception as e:
             return FFIResponse(status='error', error=str(e))
 
@@ -1705,7 +1947,7 @@ def create_server() -> JSONRPCServer:
             result = server.content_manager.scan_directory(directory)
             return {
                 "status": "success",
-                "files": {k: v.to_dict() for k, v in result.items()}
+                "files": {k: v.to_dict() for k, v in result.items()},
             }
         except Exception as e:
             return {"status": "error", "error": str(e)}
@@ -1717,6 +1959,7 @@ def create_server() -> JSONRPCServer:
             server.logger.info(f"Processing request: {method}")
 
     return server
+
 
 # ==========================================================================
 # MAIN ENTRY POINT
