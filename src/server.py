@@ -807,12 +807,13 @@ class BaseModel:
 
     def _validate_type(self, value: Any, expected_type: Any) -> bool:
         """Type validation supporting generics and unions."""
+        from typing import get_origin, get_args, Any, Union
         if expected_type is Any:
             return True
         origin = get_origin(expected_type)
         if origin is Union:
             args = get_args(expected_type)
-            return any(isinstance(value, arg) if isinstance(arg, type) else isinstance(value, str) for arg in args)
+            return any(isinstance(value, arg) if not get_origin(arg) else self._validate_type(value, arg) for arg in args)
         if origin is not None:
             if not isinstance(value, origin):
                 return False
@@ -820,11 +821,12 @@ class BaseModel:
             if origin is list and args:
                 return all(self._validate_type(item, args[0]) for item in value)
             elif origin is dict and len(args) >= 2:
-                return all(
-                    self._validate_type(k, args[0]) for k in value.keys()
-                ) and all(self._validate_type(v, args[1]) for v in value.values())
+                return all(self._validate_type(k, args[0]) for k in value.keys()) and all(
+                    self._validate_type(v, args[1]) for v in value.values()
+                )
             return True
-        return isinstance(value, expected_type)
+        # Handle non-generic types (e.g., str, int, NoneType)
+        return isinstance(value, expected_type) if isinstance(expected_type, type) else False
 
     def _validate_model(self):
         """Override for model-level validation."""
