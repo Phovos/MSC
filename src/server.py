@@ -944,36 +944,40 @@ class BaseModel:
 
     def _validate_type(self, value: Any, expected_type: Any) -> bool:
         """Type validation supporting generics and unions."""
-        from typing import get_origin, get_args, Any, Union
-
         if expected_type is Any:
             return True
         origin = get_origin(expected_type)
         if origin is Union:
             args = get_args(expected_type)
-            return any(
-                isinstance(value, arg)
-                if not get_origin(arg)
-                else self._validate_type(value, arg)
-                for arg in args
-            )
+            logger = logging.getLogger("server")
+            logger.debug(f"Validating Union: value={value}, types={args}")
+            for arg in args:
+                try:
+                    if isinstance(value, arg):
+                        return True
+                    # Handle nested generics recursively
+                    if get_origin(arg):
+                        if self._validate_type(value, arg):
+                            return True
+                except TypeError as e:
+                    logger.warning(f"Type check failed for {arg}: {e}")
+            return False
         if origin is not None:
+            logger = logging.getLogger("server")
+            logger.debug(f"Validating generic: value={value}, origin={origin}")
             if not isinstance(value, origin):
                 return False
             args = get_args(expected_type)
             if origin is list and args:
                 return all(self._validate_type(item, args[0]) for item in value)
             elif origin is dict and len(args) >= 2:
-                return all(
-                    self._validate_type(k, args[0]) for k in value.keys()
-                ) and all(self._validate_type(v, args[1]) for v in value.values())
+                return all(self._validate_type(k, args[0]) for k in value.keys()) and all(
+                    self._validate_type(v, args[1]) for v in value.values()
+                )
             return True
-        # Handle non-generic types (e.g., str, int, NoneType)
-        return (
-            isinstance(value, expected_type)
-            if isinstance(expected_type, type)
-            else False
-        )
+        logger = logging.getLogger("server")
+        logger.debug(f"Validating simple type: value={value}, expected={expected_type}")
+        return isinstance(value, expected_type)
 
     def _validate_model(self):
         """Override for model-level validation."""
