@@ -501,13 +501,13 @@ async def test_quinean_sdk():
         agency.add_action(Action({"file_exists": True}, {"action": "read_file"}))
         system = DynamicSystem()
         system.add_agency(agency)
-        initial_state = {"file_exists": True, "path": "server/test.txt"}
+        initial_state = {"file_exists": True, "path": "src/test.txt"}
         final_state = system.simulate(initial_state)
         logger.info(f"Agency simulation: {final_state}")
 
         # Test 2: Quantum manipulation of file content
         logger.info("Testing QuantumOperator with file content")
-        test_file = REPO_ROOT / "server" / "test.txt"
+        test_file = REPO_ROOT / "src" / "test.txt"
         test_file.write_text("Quantum SDK")
         content = server_instance.content_manager.get_content(test_file)
         pyword = PyWord(content.encode('utf-8'), alignment=WordAlignment.QWORD)
