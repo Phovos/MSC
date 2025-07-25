@@ -1,0 +1,1 @@
+`uv run /usr/local/python/current/bin/python /workspaces/MSC/server/bootstrap_server.py benchmark /usr/local/python/current/bin/python /workspaces/MSC/server/abilityTest.py `
