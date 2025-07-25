@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# -*- coding: utf-8 -*-
 import sys
 import platform
 import subprocess
@@ -24,6 +25,21 @@ from enum import Flag, auto
 from functools import lru_cache
 
 """
+<https://github.com/Phovos/msc> • MSC: Morphological Source Code © 2025 by Phovos
+This file uses only standard libraries.
+
+A monolithic __init__.py that provides:
+  - A cross-platform project management system (with UV integration, dependency handling, etc.)
+  - Platform-integrated process execution, benchmarking, and profiling utilities
+
+Usage examples:
+  - Project management:
+      $ python __init__.py project --root . DEV
+      $ python __init__.py project --root . --create-module mymodule DEV
+  - Benchmarking:
+      $ python __init__.py benchmark -n 5 -- python -c "print('hello')"
+
+
 CPU feature detection for x86-64 & ARM64 on our platforms, Win11 and debian/ubuntu.
 Supports Python 3.12+ with full feature detection + testing for Ryzen 5600 and GitHub CI.
 """
@@ -783,6 +799,20 @@ class Benchmark:
         print('Profile data:')
         print(profile_data)
         return best
+
+
+def generate_ansi_color(c: str) -> str:
+    """Generate an ANSI escape code for colored text."""
+    colors = {
+        'reset': '\033[0m',
+        'red': '\033[31m',
+        'green': '\033[32m',
+        'yellow': '\033[33m',
+        'blue': '\033[34m',
+        'magenta': '\033[35m',
+        'cyan': '\033[36m',
+    }
+    return colors.get(c.lower(), colors['reset'])
 
 
 @dataclass

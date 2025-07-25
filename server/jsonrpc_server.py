@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-"""
-Production-quality JSON-RPC server with BaseModel integration.
-Uses http.server for robust HTTP handling with custom BaseModel validation.
-"""
+from __future__ import annotations
 
+#!/usr/bin/env -S uv run
+# -*- coding: utf-8 -*-
 import sys
 import json
 import time
@@ -28,6 +26,13 @@ from typing import (
 from dataclasses import dataclass, field, fields
 from functools import wraps
 from concurrent.futures import ThreadPoolExecutor
+
+"""
+<https://github.com/Phovos/msc> • MSC: Morphological Source Code © 2025 by Phovos
+This file uses only standard libraries.
+Production-quality JSON-RPC server with BaseModel integration.
+Uses http.server for robust HTTP handling with custom BaseModel validation.
+"""
 
 # Configure logging
 logging.basicConfig(
