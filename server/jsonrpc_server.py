@@ -471,46 +471,56 @@ class EnhancedJSONRPCDispatcher:
             # Prepare parameters
             processed_params = await self._prepare_params(method_info, params)
 
-            # Determine how to call the function
-            sig = inspect.signature(method_info.func)
-            param_names = list(sig.parameters.keys())
-
-            if isinstance(processed_params, BaseModel):
-                # Pass BaseModel as single argument
+            # For raw_params methods, pass the processed_params directly as single argument
+            if method_info.raw_params:
                 if method_info.is_async:
                     result = await method_info.func(processed_params)
                 else:
                     loop = asyncio.get_event_loop()
                     result = await loop.run_in_executor(
                         self.executor, lambda: method_info.func(processed_params)
-                    )
-            elif isinstance(processed_params, dict):
-                # Keyword arguments
-                if method_info.is_async:
-                    result = await method_info.func(**processed_params)
-                else:
-                    loop = asyncio.get_event_loop()
-                    result = await loop.run_in_executor(
-                        self.executor, lambda: method_info.func(**processed_params)
-                    )
-            elif isinstance(processed_params, list):
-                # Positional arguments
-                if method_info.is_async:
-                    result = await method_info.func(*processed_params)
-                else:
-                    loop = asyncio.get_event_loop()
-                    result = await loop.run_in_executor(
-                        self.executor, lambda: method_info.func(*processed_params)
                     )
             else:
-                # Single parameter
-                if method_info.is_async:
-                    result = await method_info.func(processed_params)
+                # Determine how to call the function based on parameter structure
+                sig = inspect.signature(method_info.func)
+                param_names = list(sig.parameters.keys())
+
+                if isinstance(processed_params, BaseModel):
+                    # Pass BaseModel as single argument
+                    if method_info.is_async:
+                        result = await method_info.func(processed_params)
+                    else:
+                        loop = asyncio.get_event_loop()
+                        result = await loop.run_in_executor(
+                            self.executor, lambda: method_info.func(processed_params)
+                        )
+                elif isinstance(processed_params, dict):
+                    # Keyword arguments
+                    if method_info.is_async:
+                        result = await method_info.func(**processed_params)
+                    else:
+                        loop = asyncio.get_event_loop()
+                        result = await loop.run_in_executor(
+                            self.executor, lambda: method_info.func(**processed_params)
+                        )
+                elif isinstance(processed_params, list):
+                    # Positional arguments
+                    if method_info.is_async:
+                        result = await method_info.func(*processed_params)
+                    else:
+                        loop = asyncio.get_event_loop()
+                        result = await loop.run_in_executor(
+                            self.executor, lambda: method_info.func(*processed_params)
+                        )
                 else:
-                    loop = asyncio.get_event_loop()
-                    result = await loop.run_in_executor(
-                        self.executor, lambda: method_info.func(processed_params)
-                    )
+                    # Single parameter
+                    if method_info.is_async:
+                        result = await method_info.func(processed_params)
+                    else:
+                        loop = asyncio.get_event_loop()
+                        result = await loop.run_in_executor(
+                            self.executor, lambda: method_info.func(processed_params)
+                        )
 
             # Validate result if configured
             return await self._validate_result(method_info, result)
