@@ -2,77 +2,34 @@ from __future__ import annotations
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-import io
-import gc
-import re
 import sys
-import ast
-import dis
-import mmap
 import json
-import uuid
-import site
 import time
-import cmath
-import errno
-import shlex
 import ctypes
-import signal
-import random
-import pickle
 import socket
-import struct
-import pstats
-import shutil
-import weakref
-import tomllib
-import decimal
-import pathlib
 import logging
 import inspect
 import asyncio
 import hashlib
-import argparse
-import cProfile
-import platform
-import tempfile
-import mimetypes
-import functools
-import linecache
-import traceback
 import threading
 import importlib
 import subprocess
-import tracemalloc
-import http.server
-from math import sqrt
-from io import StringIO
-from array import array
-from queue import Queue, Empty
 from abc import ABC, abstractmethod
-from enum import Enum, auto, StrEnum
-from collections import namedtuple
-from operator import mul
+from enum import Enum
 from typing import (
     Any, Dict, List, Optional, Union, Callable, TypeVar,
-    Tuple, Generic, Set, Coroutine, Type, NamedTuple,
-    ClassVar, Protocol, runtime_checkable, AsyncIterator,
-    get_type_hints, get_origin, get_args
+    Type, get_type_hints, get_origin, get_args
 )
 from types import (
-    SimpleNamespace, ModuleType, MethodType,
-    FunctionType, CodeType, TracebackType, FrameType
+    SimpleNamespace
 )
 from dataclasses import dataclass, field
-from functools import reduce, lru_cache, partial, wraps
-from collections.abc import Iterable, Mapping
+from functools import partial, wraps
 from datetime import datetime
-from pathlib import Path, PureWindowsPath
+from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from contextlib import contextmanager, asynccontextmanager
+from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor
-from functools import reduce
-from importlib.util import spec_from_file_location, module_from_spec
 """(MSC) Morphological Source Code Framework – V0.0.12
 ================================================================================
 <https://github.com/Phovos/msc> • MSC: Morphological Source Code © 2025 by Phovos
@@ -695,16 +652,16 @@ class ContentManager:
                     spec = importlib.util.spec_from_file_location(module_name, str(path))
                     if spec and spec.loader:
                         module = importlib.util.module_from_spec(spec)
-                        setattr(module, '__metadata__', metadata)
+                        module.__metadata__ = metadata
                         spec.loader.exec_module(module)
                         self.module_cache.set(cache_key, module)
                         self.notify_observers(ContentChangeEvent.MODIFIED, metadata)
                         return module
                 else:
                     module = SimpleNamespace()
-                    setattr(module, '__metadata__', metadata)
+                    module.__metadata__ = metadata
                     content = self.get_content(path)
-                    setattr(module, '__content__', content)
+                    module.__content__ = content
                     self.module_cache.set(cache_key, module)
                     self.notify_observers(ContentChangeEvent.MODIFIED, metadata)
                     return module
@@ -855,7 +812,7 @@ class BaseModel:
         origin = get_origin(expected_type)
         if origin is Union:
             args = get_args(expected_type)
-            return any(self._validate_type(value, arg) for arg in args)
+            return any(isinstance(value, arg) if isinstance(arg, type) else isinstance(value, str) for arg in args)
         if origin is not None:
             if not isinstance(value, origin):
                 return False
