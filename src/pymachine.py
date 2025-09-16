@@ -7,9 +7,11 @@
 # */
 # <a href="https://github.com/Phovos/MSC">Morphological Source Code</a> © 2023 by PHOVOS:PHOVOS@outlook.com CC BY
 from __future__ import annotations
+
 # Optional dependency handling (also add to '/* script..' comment, just above)
 try:
     import flask
+
     USE_FLASK = True
     # if we omit "flask==*.*", or any non-std lib from the '/* script..' comment, then this should always fail
     pass
@@ -28,22 +30,19 @@ import platform
 import subprocess
 from array import array
 from enum import Enum, IntEnum, IntFlag, auto
-from typing import (
-    Any, List, Union, Callable, TypeVar,
-    Generic
-)
+from typing import Any, List, Union, Callable, TypeVar, Generic
 from dataclasses import dataclass
 
 # Check if we are in a managed environment
 IN_UV_ENV = os.getenv("UV_VIRTUAL_ENV") is not None
+
 
 # '--bootstrap' flag
 def bootstrap():
     """Attempt to install 'uv' and rerun the script in a managed environment."""
     print("Bootstrapping: Checking for 'uv' package manager...")
     try:
-        subprocess.run(["uv", "--version"], check=True,
-                       stdout=subprocess.DEVNULL)
+        subprocess.run(["uv", "--version"], check=True, stdout=subprocess.DEVNULL)
     except FileNotFoundError:
         print("Error: 'uv' is not installed. Please install it manually.")
         sys.exit(1)
@@ -51,11 +50,15 @@ def bootstrap():
     print("Re-executing script with 'uv run'...")
     os.execvp("uv", ["uv", "run", sys.executable] + sys.argv)
 
+
 if "--bootstrap" in sys.argv:  # Handle manual opt-in for bootstrapping
     bootstrap()
+
+
 # system and platform code
 class PlatformFactory:  # Platform abstraction
     """Detect and return the current platform."""
+
     @staticmethod
     def get_platform():
         if os.name == 'nt':
@@ -69,11 +72,13 @@ class PlatformFactory:  # Platform abstraction
         plat = PlatformFactory.get_platform()
         return WindowsPlatform() if plat == "windows" else LinuxPlatform()
 
+
 class PlatformInterface:
     """Abstract base for platform-specific implementations."""
 
     def load_c_library(self):
         raise NotImplementedError()
+
 
 class WindowsPlatform(PlatformInterface):
     def load_c_library(self):
@@ -82,12 +87,14 @@ class WindowsPlatform(PlatformInterface):
         except OSError:
             return None
 
+
 class LinuxPlatform(PlatformInterface):
     def load_c_library(self):
         try:
             return ctypes.CDLL("libc.so.6")
         except OSError:
             return None
+
 
 class ProcessorFeatures(IntFlag):
     BASIC = auto()
@@ -107,14 +114,17 @@ class ProcessorFeatures(IntFlag):
             if platform.machine().lower() in ('x86_64', 'amd64', 'x86', 'i386'):
                 if sys.platform == 'win32':
                     import winreg
-                    key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
-                                         r'HARDWARE\DESCRIPTION\System\CentralProcessor\0')
-                    identifier = winreg.QueryValueEx(
-                        key, 'ProcessorNameString')[0]
+
+                    key = winreg.OpenKey(
+                        winreg.HKEY_LOCAL_MACHINE,
+                        r'HARDWARE\DESCRIPTION\System\CentralProcessor\0',
+                    )
+                    identifier = winreg.QueryValueEx(key, 'ProcessorNameString')[0]
                 else:
                     with open('/proc/cpuinfo') as f:
-                        identifier = next(line.split(
-                            ':')[1] for line in f if 'model name' in line)
+                        identifier = next(
+                            line.split(':')[1] for line in f if 'model name' in line
+                        )
                 identifier = identifier.lower()
                 if 'avx512' in identifier:
                     features |= cls.AVX512
@@ -138,6 +148,7 @@ class ProcessorFeatures(IntFlag):
             pass
         return features
 
+
 @dataclass
 class RegisterSet:
     gp_registers: int
@@ -149,11 +160,24 @@ class RegisterSet:
     def detect_current(cls) -> 'RegisterSet':
         machine = platform.machine().lower()
         if machine in ('x86_64', 'amd64'):
-            return cls(gp_registers=16, vector_registers=32, register_width=64, vector_width=512)
+            return cls(
+                gp_registers=16,
+                vector_registers=32,
+                register_width=64,
+                vector_width=512,
+            )
         elif machine.startswith('arm64'):
-            return cls(gp_registers=31, vector_registers=32, register_width=64, vector_width=128)
+            return cls(
+                gp_registers=31,
+                vector_registers=32,
+                register_width=64,
+                vector_width=128,
+            )
         else:
-            return cls(gp_registers=8, vector_registers=8, register_width=32, vector_width=128)
+            return cls(
+                gp_registers=8, vector_registers=8, register_width=32, vector_width=128
+            )
+
 
 class ProcessorArchitecture(IntEnum):
     X86 = auto()
@@ -175,9 +199,12 @@ class ProcessorArchitecture(IntEnum):
         elif machine.startswith('riscv'):
             return cls.RISCV64 if sys.maxsize > 2**32 else cls.RISCV32
         raise ValueError(f"Unsupported architecture: {machine}")
+
+
 @dataclass
 class MemoryModel:
     """Maps linear-virtual address space per the OS to Frames+Lifetimes+Arenas (linear allocator).."""
+
     ptr_size: int = ctypes.sizeof(ctypes.c_void_p)
     word_size: int = ctypes.sizeof(ctypes.c_size_t)
     cache_line_size: int = 64
@@ -186,7 +213,9 @@ class MemoryModel:
     @classmethod
     def get_system_info(cls) -> 'MemoryModel':
         try:
-            with open('/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size') as f:
+            with open(
+                '/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size'
+            ) as f:
                 cache_line_size = int(f.read().strip())
         except (FileNotFoundError, ValueError):
             cache_line_size = 64
@@ -194,8 +223,10 @@ class MemoryModel:
             ptr_size=ctypes.sizeof(ctypes.c_void_p),
             word_size=ctypes.sizeof(ctypes.c_size_t),
             cache_line_size=cache_line_size,
-            page_size=cls.page_size
+            page_size=cls.page_size,
         )
+
+
 class WordAlignment(IntEnum):
     UNALIGNED = 1
     WORD = 2
@@ -203,13 +234,17 @@ class WordAlignment(IntEnum):
     QWORD = 8
     CACHE_LINE = 64
     PAGE = 4096
+
+
 class WordSize(enum.IntEnum):
     # Utilization of anisotropy about (0) and the inflation of state space makes WordSize a core-scalar
-    BYTE = 1     # 8-bit 'consumer hardware' = (1); Arbitrarily scaled: ryzen5 & NVIDIA RTX
-    SHORT = 2    # 16-bit
-    INT = 4      # 32-bit
-    LONG = 8     # 64-bit; does not refer to the x86 x64 register(s)!
-# # pymachine.py 
+    BYTE = 1  # 8-bit 'consumer hardware' = (1); Arbitrarily scaled: ryzen5 & NVIDIA RTX
+    SHORT = 2  # 16-bit
+    INT = 4  # 32-bit
+    LONG = 8  # 64-bit; does not refer to the x86 x64 register(s)!
+
+
+# # pymachine.py
 """
 CanonTM: Tuple(Q,T,B,ε,𝛿.q0,F)
 Q: finite set of states
@@ -235,10 +270,14 @@ R = TypeVar('R')  # Result type
 BYTE = TypeVar("BYTE", bound="ByteWord")
 T_co = TypeVar('T_co', covariant=True)  # Covariant Type structure
 V_co = TypeVar('V_co', covariant=True)  # Covariant Value space
-C_co = TypeVar('C_co', bound=Callable[..., Any], covariant=True)  # Covariant Control space
+C_co = TypeVar(
+    'C_co', bound=Callable[..., Any], covariant=True
+)  # Covariant Control space
 T_anti = TypeVar('T_anti', contravariant=True)  # Contravariant Type structure
 V_anti = TypeVar('V_anti', contravariant=True)  # Contravariant Value space
-C_anti = TypeVar('C_anti', bound=Callable[..., Any], contravariant=True)  # Contravariant Computation space
+C_anti = TypeVar(
+    'C_anti', bound=Callable[..., Any], contravariant=True
+)  # Contravariant Computation space
 # Operator phenomenology, etc.
 """Core Operators:
 
@@ -252,14 +291,18 @@ Algebraic Properties:
 Associativity: (A @ B) @ C = A @ (B @ C)
 Distributivity: A * (B + C) = (A * B) + (A * C)
 Adjoint rules: (A @ B)† = B† @ A†"""
+
+
 class OperatorType(Enum):
     """Fundamental operation types in our computational 'universe', referring explicitly to the universal-set [], and given the null set (a 00000000 ByteWord) as 'glue' (insofar as sheafification, groups, topos etc). The 'universe' of runtime, the applied set, is strictly-bounded and inertia-local, no relativistic effects outside of the 'relativistic effects' of morphological derivation (or time-like integration)* with respect to the cross-product of two cartesian coordinates in super position; a 'Born Rule'-type ontological scaffolding."""
-    COMPOSITION = auto()   # Function composition (f >> g)
-    TENSOR      = auto()   # Tensor product (⊗)
-    DIRECT_SUM  = auto()   # Direct sum (⊕)
-    OUTER       = auto()   # Outer product (|ψ⟩⟨φ|)
-    ADJOINT     = auto()   # Hermitian adjoint (†)
-    MEASUREMENT = auto()   # Quantum measurement (⟨M|ψ⟩)
+
+    COMPOSITION = auto()  # Function composition (f >> g)
+    TENSOR = auto()  # Tensor product (⊗)
+    DIRECT_SUM = auto()  # Direct sum (⊕)
+    OUTER = auto()  # Outer product (|ψ⟩⟨φ|)
+    ADJOINT = auto()  # Hermitian adjoint (†)
+    MEASUREMENT = auto()  # Quantum measurement (⟨M|ψ⟩)
+
 
 class QuantumState(enum.Enum):
     """
@@ -270,10 +313,11 @@ class QuantumState(enum.Enum):
     - Value: Semantic vector (posit) tracks position with chiral updates.
     - Code: QOperator evolves ByteWords as quantum-like states.
     """
+
     SUPERPOSITION = 1  # Handle-only state, like a MARKOVIAN (-1) ByteWord with chiral tx (-1), history-dependent.
-    ENTANGLED = 2      # Referenced but not materialized, like NON_MARKOVIAN (math.e), reversible with energy cost.
-    COLLAPSED = 4      # Materialized state, like a stable quine (SmallTalk object), executable after measurement.
-    DECOHERENT = 8     # Garbage-collected state, reversible only by re-running with new chiral tape (thermodynamic cost).
+    ENTANGLED = 2  # Referenced but not materialized, like NON_MARKOVIAN (math.e), reversible with energy cost.
+    COLLAPSED = 4  # Materialized state, like a stable quine (SmallTalk object), executable after measurement.
+    DECOHERENT = 8  # Garbage-collected state, reversible only by re-running with new chiral tape (thermodynamic cost).
 
     def transition(self, operator: 'OperatorType') -> 'QuantumState':
         """
@@ -291,6 +335,7 @@ class QuantumState(enum.Enum):
             return QuantumState.SUPERPOSITION
         return self
 
+
 # Semantic classes
 _ANSI_RE = re.compile(
     r"""(
@@ -303,9 +348,11 @@ _ANSI_RE = re.compile(
     re.VERBOSE,
 )
 
+
 def _to_latin1_bytes(s: str) -> bytes:
     """Strict Latin-1 to guarantee 0..255 domain. Raises on non-ANSI."""
     return s.encode("latin-1", errors="strict")
+
 
 def tokenize_ansi(s: str) -> List[bytes]:
     """Split into byte-tokens while preserving whitespace and punctuation."""
@@ -315,17 +362,21 @@ def tokenize_ansi(s: str) -> List[bytes]:
         tokens.append(_to_latin1_bytes(tok))
     return tokens
 
+
 class PyWord(Generic[T]):
     """
     [[PyWord]] represents a word-sized value optimized for CPython.
     It manages alignment according to the system's memory model and
     provides conversion between Python and C types.
     """
+
     __slots__ = ('_value', '_alignment', '_arch', '_mem_model')
 
-    def __init__(self,
-                 value: Union[int, bytes, bytearray, array.array],
-                 alignment: WordAlignment = WordAlignment.WORD):
+    def __init__(
+        self,
+        value: Union[int, bytes, bytearray, array.array],
+        alignment: WordAlignment = WordAlignment.WORD,
+    ):
         self._mem_model = MemoryModel.get_system_info()
         self._arch = ProcessorArchitecture.current()
         self._alignment = alignment
@@ -334,28 +385,34 @@ class PyWord(Generic[T]):
         self._store_value(value)
 
     def _calculate_aligned_size(self) -> int:
-        base_size = max(self._mem_model.word_size,
-                        ctypes.sizeof(ctypes.c_size_t))
+        base_size = max(self._mem_model.word_size, ctypes.sizeof(ctypes.c_size_t))
         return (base_size + self._alignment - 1) & ~(self._alignment - 1)
 
     def _allocate_aligned(self, size: int) -> ctypes.Array:
         class AlignedArray(ctypes.Structure):
             _pack_ = self._alignment
             _fields_ = [("data", ctypes.c_char * size)]
+
         return AlignedArray()
 
     def _store_value(self, value: Union[int, bytes, bytearray, array.array]) -> None:
         if isinstance(value, int):
-            if self._arch in (ProcessorArchitecture.X86_64, ProcessorArchitecture.ARM64, ProcessorArchitecture.RISCV64):
+            if self._arch in (
+                ProcessorArchitecture.X86_64,
+                ProcessorArchitecture.ARM64,
+                ProcessorArchitecture.RISCV64,
+            ):
                 c_val = ctypes.c_uint64(value)
             else:
                 c_val = ctypes.c_uint32(value)
-            ctypes.memmove(ctypes.addressof(self._value),
-                           ctypes.addressof(c_val), ctypes.sizeof(c_val))
+            ctypes.memmove(
+                ctypes.addressof(self._value),
+                ctypes.addressof(c_val),
+                ctypes.sizeof(c_val),
+            )
         else:
             value_bytes = memoryview(value).tobytes()
-            ctypes.memmove(ctypes.addressof(self._value),
-                           value_bytes, len(value_bytes))
+            ctypes.memmove(ctypes.addressof(self._value), value_bytes, len(value_bytes))
 
     def get_raw_pointer(self) -> int:
         return ctypes.addressof(self._value)
@@ -384,36 +441,41 @@ class PyWord(Generic[T]):
             return bytes(self._value.data)
         return self._value.tobytes()
 
+
 class PyWordCache:
     """LRU Cache for [[PyWord]] objects to minimize allocations."""
+
 
 # Ontology-types
 class Morphology(enum.Enum):
     """
     Represents the (thermo) dynamism and floor morphic state of a ByteWord
-    
+
     C = 0: Floor morphic state (stable, low-energy)
     C = 1: Dynamic or high-energy state
 
     - DYNAMIC (1): Other icons CAN point to this icon
     - MORPHIC (0): Other icons CANNOT point to this icon
-    
+
     This ontology maps to intensive & extensive thermodynamic character. The 'location' of this character is about the boundary (integral and non-relativistic), with observables within the bulk (quantized, with uncertainty, requiring an Einsteinian observer).
 
     - MARKOVIAN (-1): History-dependant
     - NON_MARKOVIAN (math.e): "Fully-quantized" null-vector
-    
+
     Implementation-not: (-1) & (math.e) are synonyms of (0) & (1), respectivly, in certain contexts such as during the creation of homogenous coordinate-'tooples', appearing as 0, 1, or a power of 2 (that needs to then divide the whole-column by it's total, as-many times as-necessary, until the new-homogenous row is only (0) and/or (1)). This mirrors the 'duputization cascade' and QuineicSaddle historisis function/Kronecker-Dirac delta (象 in the sense of phenomenological identity).
     """
-    MORPHIC = 0      # Stable, low-energy state
-    DYNAMIC = 1      # High-energy, potentially transformative state
+
+    MORPHIC = 0  # Stable, low-energy state
+    DYNAMIC = 1  # High-energy, potentially transformative state
     # Time-like but not relativistic Noetherian/Machian bulk-orchestration
-    MARKOVIAN = -1    # Forward-evolving, irreversible
+    MARKOVIAN = -1  # Forward-evolving, irreversible
     NON_MARKOVIAN = math.e  # Reversible, with memory
+
 
 class WindingMode(enum.Enum):
     BINARY = "binary"
     TERNARY = "ternary"
+
 
 GLOBAL_WINDING_MODE = WindingMode.TERNARY
 
@@ -433,9 +495,12 @@ class WindingPair:
                 raise ValueError("Ternary winding must be -1, 0, 1")
 
     def tx(self, a: int, b: int) -> int:
-        if a == b: return 0
-        if a == 0: return b
-        if b == 0: return a
+        if a == b:
+            return 0
+        if a == 0:
+            return b
+        if b == 0:
+            return a
         return 0
 
     def apply_val(self, mask: "WindingPair") -> "WindingPair":
@@ -446,7 +511,7 @@ class WindingPair:
         return WindingPair(
             self.w1 if mask.w1 == -1 else self.tx(self.w1, mask.w1),
             self.w2 if mask.w2 == -1 else self.tx(self.w2, mask.w2),
-            mode=self.mode
+            mode=self.mode,
         )
 
     def to_state_index(self) -> int:
@@ -454,6 +519,7 @@ class WindingPair:
             return (self.w1 << 1) | self.w2
         idx_map = {-1: 0, 0: 1, 1: 2}
         return (idx_map[self.w1] * 3) + idx_map[self.w2]
+
 
 @dataclass
 class ByteWord:
