@@ -1,5 +1,5 @@
 {
-  "name": "Py 3.14 with Jupyter, nox and uv.",
+  "name": "Py 3.13 with Jupyter, nox and uv.",
   "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu",
   "features": {
     "ghcr.io/devcontainers/features/git:1": {},
@@ -10,7 +10,7 @@
     "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
     "ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
     "ghcr.io/devcontainers/features/python:1": {
-      "version": "3.14.0"
+      "version": "3.13"
     },
     "ghcr.io/va-h/devcontainers-features/uv:1": {},
     "ghcr.io/devcontainers-extra/features/mypy:2": {},
