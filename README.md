@@ -256,7 +256,6 @@ So while they both leverage masking, they do so in orthogonal bases:
 
 This is analogous to position vs. momentum representations in quantum mechanics. You can’t diagonalize both at once, but they are dual descriptions of the same underlying wavefunction.
 
-### Posthumous, excessive, praise and congratulations, due to:
 
 This is semantic-lifting-preserving and reversible, modulo compression/entropy constraints.
     
@@ -267,8 +266,6 @@ TopoWord ≅ ByteWord, up to semantic functor.
 I.e.,
 
     There exists a functor F such that F(ByteWord) = TopoWord under reinterpretation of field meanings and traversal rules.
-
-And Jung, and Maupertuis, and Schopenhauer did have invaluable contributions to cutting-edge science.
 
 Let us now discuss the Dialectical obervational 'masking' that powers bifurcation and collapse; but masking in two fundamentally distinct ways:
 
@@ -385,7 +382,6 @@ Quantum-Electronic Phenomenology
     Singularity as Continuous State Transformation
     The singularity is not a moment of technological convergence but an ongoing process of state transformation, where observation itself is an active part of the negotiation.
 
-## TODO: connect the Hinkensian complete and Turing Complete
 ## CAP Theorem vs Gödelian Logic in Hilbert Space
 
 - [[CAP]]: {Consistency, Availability, Partition Tolerance}
