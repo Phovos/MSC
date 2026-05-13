@@ -1,12 +1,12 @@
 # demiurge - fossilMirror
 
-Automated, idempotent `fossil→git*n` mirroring with built-in audit trail. Baby no cry; unless you mess-up [do not let your infants eat this shampoo, ladies and gentlemen].
+Automated, idempotent `fossil→git*n` mirroring with built-in audit trail (IN FOSSIL, which is chill [unlike so and so]) [do not let your infants eat this shampoo, ladies and gentlemen].
 
 Let your fossil repository automatically push to GitHub, GitLab, Gitee, or any git remote on every commit, with fossil-native failure modes. Baby no cry, if dealing with git stresses you out just do everything perfectly and use this module, and no more tears. At-least, when you mess-up and have so spend painful 30minutes double and triple checking various CLI commands and args and their ever-loving flags; with full failure tracking via fossil tags. Fossil is chill about your failures, just logs-them into the fossil repository, lazily. If for some reason you don't want fossil to artifice your failures you can, before your next fossil commit, get your git situation figured-out, and then clean-up the disaster zone such that fossil is none-the wiser next time it is invoked.
 
 ## Why This Exists
 
-I love Fossil SCM's simplicity and power, but increasing my power level in a world that has a society requires talking to git, and you aren't happy about it.
+I love Fossil SCM's simplicity and power, but increasing my power level in a world that has a society requires talking to git, and aint happy about it.
 - GitHub/aliyun/GitLab/gitee etc. hosting
 - CI/CD pipelines that only speak git
 - Collaboration with git-only teams
