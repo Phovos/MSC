@@ -1,0 +1,295 @@
+FOSSIL-GIT WORKING GROUP                                Draft RFC fosgit
+Category: Informational                                         May 2026
+ISSN: --
+
+
+        A Bidirectional Source Control Mirror Protocol
+        Using Artifact Naming as Foreign Keys (BSCM/1)
+
+
+Status of This Memo
+
+   This document is a working draft. It describes a convention, not a
+   standard. Implementors are encouraged to adopt, extend, or argue
+   with it loudly.
+
+Abstract
+
+   This document specifies a protocol by which two heterogeneous
+   version control systems — specifically Fossil and Git — may
+   maintain a bidirectional audit trail of synchronization state
+   without shared databases, middleware, daemons, or third-party
+   services. The protocol's sole mechanism is a naming convention
+   applied to native artifacts in each system. The names ARE the
+   join condition.
+
+
+1. The Problem
+
+   Two source control systems exist. Neither knows about the other.
+   A practitioner wishes to use both simultaneously: Fossil as the
+   authoritative local repository, Git-hosting services (GitLab,
+   Gitee, Aliyun, etc.) as networked mirrors.
+
+   Naive solutions require a third component: a database, log file,
+   or daemon that tracks "what was mirrored where and when." This
+   third component is a liability. It can be lost, corrupted, or
+   fall out of sync with reality.
+
+   The desiderata are:
+
+      (a) Every synchronization event is recorded permanently.
+      (b) Either system can be interrogated independently for
+          the full history of events.
+      (c) A link from an artifact in one system leads directly
+          to the corresponding artifact in the other.
+      (d) No third component is required.
+
+
+2. The Axiom
+
+   A naming convention applied consistently to native artifacts
+   in two independent systems is sufficient to satisfy (a)-(d).
+
+   Formally:
+
+      If artifact A in system S₁ has a name that contains the
+      identifier of artifact B in system S₂, then A is a
+      persistent, queryable foreign key into S₂, requiring no
+      shared state beyond the naming convention itself.
+
+   Corollary: Two systems linked only by naming conventions have
+   no shared failure mode. Either system may be lost, restored
+   from backup, or replaced without invalidating the other's
+   audit trail.
+
+
+3. Terminology
+
+   Fossil UUID   A 40-character hex SHA3 identifying a Fossil
+                 checkin. Globally unique. Immutable.
+
+   Git Hash      A 40-character hex SHA1/SHA256 identifying a
+                 Git commit. Globally unique within a repository.
+
+   Fossil Tag    A key-value annotation attached to a Fossil
+                 checkin. Queryable via `fossil tag list`.
+                 Persistent. Not a commit.
+
+   Git Branch    A named, mutable pointer to a Git commit.
+                 When pushed to a remote, visible to all
+                 participants.
+
+   Mirror        A Git repository that is a structural export
+                 of a Fossil repository, maintained incrementally
+                 by `fossil git export`.
+
+   Remote        A Git hosting service (GitLab, Gitee, Aliyun,
+                 etc.) that receives pushes from the Mirror.
+
+
+4. The Protocol
+
+4.1  Direction: Fossil → Git (Export)
+
+   When a Fossil checkin is exported to the Mirror, the following
+   tag is applied to the Fossil tip:
+
+      gitexport:{git-hash}
+
+   Where {git-hash} is the SHA resolved from `git rev-parse HEAD`
+   in the Mirror after export completes.
+
+   Semantics: "This Fossil checkin has a corresponding Git commit.
+   The Git commit is identifiable by {git-hash}."
+
+   This tag is a persistent foreign key from Fossil into Git.
+
+4.2  Direction: Fossil → Remote (Push, Success)
+
+   When the Mirror is successfully pushed to a named Remote, the
+   following tag is applied to the Fossil tip:
+
+      gitpush:{remote-name}:ok:{git-hash}
+
+   Where {remote-name} is the human-readable identifier of the
+   Remote as declared in configuration, and {git-hash} is as
+   above.
+
+   Semantics: "The Git commit identified by {git-hash} has landed
+   on {remote-name}. The push succeeded."
+
+4.3  Direction: Fossil → Remote (Push, Failure)
+
+   When a push to a named Remote fails (non-fast-forward, network
+   error, authentication failure, or any non-zero exit), two
+   things happen:
+
+   (a) The following tag is applied to the Fossil tip:
+
+          gitpush:{remote-name}:fail:{git-hash}
+
+   (b) In the Mirror, a branch is created and pushed:
+
+          fossil-conflict/{fossil-uuid}
+
+       Where {fossil-uuid} is the UUID of the Fossil checkin
+       that triggered the export.
+
+   Semantics of (a): "A push was attempted. It failed. The state
+   requiring resolution is identified by {git-hash} on the Git
+   side."
+
+   Semantics of (b): "This branch in Git represents the Fossil
+   state at checkin {fossil-uuid} at the time of conflict. The
+   Fossil checkin is directly interrogable."
+
+   The branch name is a persistent foreign key from Git into
+   Fossil. It survives force-pushes to main, branch deletions,
+   and repository clones.
+
+4.4  Resolution
+
+   A :fail tag on tip is the operational signal that human
+   intervention is required. No other monitoring is needed.
+
+   Resolution procedure:
+
+      1. Inspect the failure: `fossil tag list`
+      2. Examine the conflict branch on the Remote.
+      3. Resolve divergence by any means (rebase, merge, or
+         re-establishment of fast-forward history).
+      4. Recommit in Fossil.
+      5. The after-receive hook fires automatically.
+      6. A :ok tag replaces :fail semantically (both remain
+         in the audit trail; :ok is the current state).
+
+
+5. The Full Audit Trail
+
+   After N commits with mixed success and failure, the Fossil tag
+   list constitutes a complete, immutable, ordered ledger:
+
+      gitexport:a3f9c1...
+      gitpush:gitlab:ok:a3f9c1...
+      gitpush:gitee:ok:a3f9c1...
+      gitpush:aliyun:fail:a3f9c1...
+      gitexport:b7d402...
+      gitpush:gitlab:ok:b7d402...
+      gitpush:gitee:ok:b7d402...
+      gitpush:aliyun:ok:b7d402...
+
+   From this list alone, an auditor can determine:
+
+      - Every commit that was exported and when (by Fossil's
+        timeline, not a logfile).
+      - Every remote that received each commit.
+      - Every failure and whether it was subsequently resolved.
+      - The exact Git commit corresponding to each Fossil state.
+
+   No log file. No database. No daemon. Fossil is the ledger.
+
+
+6. Properties
+
+6.1  Fossil is authoritative.
+
+   Git remotes are outputs. They receive but do not influence.
+   All state transitions originate from Fossil checkins.
+
+6.2  The protocol is append-only.
+
+   Tags are not deleted. Failures are not erased. A :ok tag
+   after a :fail tag does not remove the failure from history;
+   it records its resolution. The ledger grows monotonically.
+
+6.3  The protocol is recoverable.
+
+   If the Mirror directory is lost, `fossil git export` rebuilds
+   it from scratch. The Fossil tags remain valid. Remotes retain
+   whatever was successfully pushed. No state is unrecoverable.
+
+6.4  The protocol is stateless.
+
+   The implementation requires no persistent process, no open
+   socket, and no file beyond the Fossil repository itself. It
+   is activated entirely by the after-receive hook and terminates
+   when the hook returns.
+
+6.5  The protocol is offline-tolerant.
+
+   A Remote being unreachable produces a :fail tag. When the
+   Remote becomes reachable again, a recommit triggers a retry.
+   The practitioner need not manually track which remotes are
+   behind.
+
+
+7. Security Considerations
+
+7.1  Hook execution.
+
+   The after-receive hook (fossilgitmirror) MUST be invoked via
+   fork/execvp or equivalent. It MUST NOT be invoked via system()
+   or shell interpolation. Fossil UUIDs and Git hashes are
+   hex strings and are safe in practice, but the protocol makes
+   no guarantees about future artifact identifiers or remote names
+   supplied by configuration. Literal argument passing is required.
+
+7.2  Trust boundary.
+
+   Fossil is the trust boundary. Nothing is exported or pushed
+   without a Fossil checkin occurring first. The Mirror and all
+   Remotes are strictly outbound recipients.
+
+7.3  Unprivileged observability.
+
+   The Fossil web interface and any static observability layer
+   built from it (e.g., GitLab Pages, a Fossil-served dashboard)
+   operate read-only against the Fossil repository. They cannot
+   influence the protocol's operation. This is a feature.
+
+
+8. We Don't Have To Choose
+
+   The premise of this protocol is that Fossil and Git are not
+   competitors requiring a choice. They are complementary:
+
+      Fossil provides: rich local history, wiki, tickets,
+      forum, single-file distribution, the ledger.
+
+      Git provides: ubiquitous hosting, collaboration surface,
+      ecosystem tooling, the network.
+
+   BSCM/1 lets a practitioner use both, with Fossil as the
+   pond and Git-hosting services as the sea, linked by nothing
+   more than names.
+
+
+Appendix A. Tag Format Summary
+
+   gitexport:{git-hash}
+   gitpush:{remote}:ok:{git-hash}
+   gitpush:{remote}:fail:{git-hash}
+
+Appendix B. Branch Name Format
+
+   fossil-conflict/{fossil-uuid}
+
+Appendix C. Required Tooling
+
+   fossil (any version supporting `fossil git export` and
+           `fossil hook add`)
+   git    (any version supporting `git remote` and `git push`)
+   C99 compiler (one-time, for fossilgitmirror)
+   Python 3 (one-time, for fossilgitinit)
+
+Author/contact:
+
+```
+"© 2026 `Phovos` (phovos@outlook.com)":
+    (1) https://gitlab.com/morphological/source/code
+    (2) https://github.com/Morphological-Source-Code
+    (3) https://reddit.com/r/morphological
+```
+
+[End of RFC]
