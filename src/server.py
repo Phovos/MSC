@@ -1,7 +1,7 @@
-from __future__ import annotations
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import os
 import sys
 import json
@@ -223,7 +223,6 @@ class LogFilter(logging.Filter):
         message = record.getMessage()
         return not any(pattern in message for pattern in self.exclude_patterns)
 
-
 def setup_logging(config: AppConfig) -> logging.Logger:
     """Configure application logging."""
     logging.setLoggerClass(AppLogger)
@@ -259,12 +258,6 @@ def setup_logging(config: AppConfig) -> logging.Logger:
     ch.addFilter(exclude_filter)
     logger.addHandler(ch)
     return logger
-
-
-# ==========================================================================
-# METRICS
-# ==========================================================================
-
 
 class PerformanceMetrics:
     """Track and report performance metrics."""
@@ -321,10 +314,7 @@ class PerformanceMetrics:
         with self._lock:
             self._metrics = {}
 
-
-# Global performance metrics instance
-performance_metrics = PerformanceMetrics()
-
+performance_metrics = PerformanceMetrics()  # Global performance metrics instance
 
 def measure_performance(func):
     """Decorator to measure function performance."""
@@ -336,12 +326,7 @@ def measure_performance(func):
 
     return wrapper
 
-
-# ==========================================================================
 # ERRORS
-# ==========================================================================
-
-
 class AppError(Exception):
     """Base exception for application errors."""
 
@@ -368,13 +353,11 @@ class SecurityError(AppError):
     def __init__(self, message: str):
         super().__init__(message, "SECURITY_ERROR", 403)
 
-
 class ContentError(AppError):
     """Content related errors."""
 
     def __init__(self, message: str):
         super().__init__(message, "CONTENT_ERROR", 400)
-
 
 def error_handler(logger):
     """Decorator for standardized error handling."""
@@ -396,9 +379,7 @@ def error_handler(logger):
                 raise AppError(f"An unexpected error occurred: {str(e)}")
 
         return wrapper
-
     return decorator
-
 
 def retry(
     max_attempts: int = 3,
@@ -407,7 +388,6 @@ def retry(
     logger: Optional[logging.Logger] = None,
 ):
     """Decorator to retry functions with exponential backoff."""
-
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         def wrapper(*args, **kwargs) -> Any:
@@ -428,15 +408,9 @@ def retry(
                     attempt += 1
 
         return wrapper
-
     return decorator
 
-
-# ==========================================================================
 # SECURITY
-# ==========================================================================
-
-
 class AccessLevel(Enum):
     READ = 1
     WRITE = 2
@@ -447,7 +421,6 @@ class AccessLevel(Enum):
         if self.__class__ is other.__class__:
             return self.value >= other.value
         return NotImplemented
-
 
 @dataclass
 class AccessPolicy:
@@ -489,10 +462,8 @@ class AccessPolicy:
             return True
         return namespace == pattern
 
-
 class SecurityContext:
     """Manages security context with audit trail."""
-
     def __init__(self, user_id: str, access_policy: AccessPolicy, logger=None):
         self.user_id = user_id
         self.access_policy = access_policy
@@ -554,12 +525,7 @@ class SecurityContext:
                 self._audit_log = self._audit_log[-1000:]
             self._last_audit_flush = datetime.now()
 
-
-# ==========================================================================
 # CONTENT MANAGEMENT
-# ==========================================================================
-
-
 @dataclass
 class FileMetadata:
     path: Path
@@ -583,12 +549,10 @@ class FileMetadata:
         result['modified'] = self.modified.isoformat()
         return result
 
-
 class ContentChangeEvent(Enum):
     CREATED = "created"
     MODIFIED = "modified"
     DELETED = "deleted"
-
 
 class ContentObserver:
     """Interface for content change observers."""
@@ -596,7 +560,6 @@ class ContentObserver:
     def notify(self, event: ContentChangeEvent, metadata: FileMetadata) -> None:
         """Handle content change notification."""
         pass
-
 
 class ContentCache:
     """LRU cache for file content with TTL support."""
@@ -637,7 +600,6 @@ class ContentCache:
     def clear(self) -> None:
         with self._lock:
             self._cache.clear()
-
 
 class ContentManager:
     """Manages file content with caching and metadata tracking."""
@@ -898,12 +860,7 @@ class ContentManager:
         self.content_cache.invalidate(f"content:{abs_path}")
         self.module_cache.invalidate(abs_path)
 
-
-# ==========================================================================
 # DOMAIN LAYER: BASEMODEL AND VALIDATION FRAMEWORK
-# ==========================================================================
-
-
 def validate(validator: Callable[[Any], None]):
     """Decorator for field validation methods."""
 
@@ -916,7 +873,6 @@ def validate(validator: Callable[[Any], None]):
         return wrapper
 
     return decorator
-
 
 @dataclass(frozen=True)
 class BaseModel:
@@ -1041,12 +997,7 @@ class BaseModel:
                 result[field_obj.name] = value
         return result
 
-
-# ==========================================================================
 # BUSINESS DOMAIN MODELS
-# ==========================================================================
-
-
 @dataclass(frozen=True)
 class CodeRequest(BaseModel):
     """Model for code execution requests."""
@@ -1058,7 +1009,6 @@ class CodeRequest(BaseModel):
     def validate_instruct(self, value: str) -> None:
         """Ensure instruct is a string."""
         pass
-
 
 @dataclass(frozen=True)
 class CodeResponse(BaseModel):
@@ -1073,7 +1023,6 @@ class CodeResponse(BaseModel):
         """Ensure status is valid."""
         pass
 
-
 @dataclass(frozen=True)
 class FFIRequest(BaseModel):
     """Model for FFI calls."""
@@ -1082,7 +1031,6 @@ class FFIRequest(BaseModel):
     function: str
     args: List[Any]
     user_id: Optional[str] = None
-
 
 @dataclass(frozen=True)
 class FFIResponse(BaseModel):
@@ -1097,14 +1045,12 @@ class FFIResponse(BaseModel):
         """Ensure status is valid."""
         pass
 
-
 @dataclass(frozen=True)
 class MetadataRequest(BaseModel):
     """Model for metadata requests."""
 
     path: str
     user_id: Optional[str] = None
-
 
 @dataclass(frozen=True)
 class MetadataResponse(BaseModel):
@@ -1119,12 +1065,7 @@ class MetadataResponse(BaseModel):
         """Ensure status is valid."""
         pass
 
-
-# ==========================================================================
 # TRANSPORT LAYER
-# ==========================================================================
-
-
 class Transport(ABC):
     """Abstract base class for transport protocols."""
 
@@ -1140,7 +1081,6 @@ class Transport(ABC):
     @abstractmethod
     async def stop(self):
         pass
-
 
 class HTTPTransport(Transport):
     """HTTP transport using ThreadingHTTPServer."""
@@ -1281,7 +1221,6 @@ class HTTPTransport(Transport):
             if self.logger:
                 self.logger.info("HTTP server shutdown complete")
 
-
 class UDPTransport(Transport):
     """UDP transport for JSON-RPC datagrams."""
 
@@ -1323,7 +1262,6 @@ class UDPTransport(Transport):
             self.sock.close()
             if self.logger:
                 self.logger.info("UDP server shutdown complete")
-
 
 class TCPTransport(Transport):
     """TCP transport for JSON-RPC streams."""
@@ -1382,7 +1320,6 @@ class TCPTransport(Transport):
             self.server.close()
             if self.logger:
                 self.logger.info("TCP server shutdown complete")
-
 
 class WebSocketTransport(Transport):
     """WebSocket transport for JSON-RPC."""
@@ -1541,12 +1478,7 @@ class WebSocketTransport(Transport):
             if self.logger:
                 self.logger.info("WebSocket server shutdown complete")
 
-
-# ==========================================================================
 # JSON-RPC DISPATCHER
-# ==========================================================================
-
-
 class JSONRPCError(Exception):
     """JSON-RPC error."""
 
@@ -1572,7 +1504,6 @@ class JSONRPCError(Exception):
             error["data"] = self.data
         return error
 
-
 @dataclass
 class MethodInfo:
     """Method metadata."""
@@ -1584,7 +1515,6 @@ class MethodInfo:
     input_model: Optional[Type[BaseModel]] = None
     output_model: Optional[Type[BaseModel]] = None
     raw_params: bool = False
-
 
 class JSONRPCDispatcher:
     """JSON-RPC dispatcher."""
@@ -1815,12 +1745,7 @@ class JSONRPCDispatcher:
             self.logger.info("Shutting down thread pool executor...")
         self.executor.shutdown(wait=True)
 
-
-# ==========================================================================
 # SERVER SETUP
-# ==========================================================================
-
-
 class JSONRPCServer:
     def __init__(self, config: Optional[AppConfig] = None):
         self.config = config or AppConfig.from_env()
@@ -1867,7 +1792,6 @@ class JSONRPCServer:
                 self.logger.info("Received interrupt signal")
         finally:
             await self.stop()
-
 
 def create_server() -> JSONRPCServer:
     config = AppConfig(port=8000, debug=True)
@@ -1964,12 +1888,7 @@ def create_server() -> JSONRPCServer:
 
     return server
 
-
-# ==========================================================================
-# MAIN ENTRY POINT
-# ==========================================================================
-
-if __name__ == "__main__":
+if __name__ == "__main__":  # MAIN ENTRY POINT
     server = create_server()
     try:
         asyncio.run(server.run_forever())
