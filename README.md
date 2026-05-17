@@ -1,20 +1,33 @@
-# demiurge - fossilMirror
+---
+"description": >
+    'fosgit; a C/CPython baby no cry dual SCM system'
+root: "./morphologi/fosgit"
+name: "README.md"
+version: 0.2.23
+license-code+file(s): BSD 3-Clause
+"© 2026 `Phovos` (phovos@outlook.com)":
+    (1) https://gitlab.com/morphological/source/code
+    (2) https://github.com/Morphological-Source-Code
+    (3) https://reddit.com/r/morphological
+---
+
+# fosgit - fossmirror No tears dual-SCM
 
 Automated, idempotent `fossil→git*n` mirroring with built-in audit trail (IN FOSSIL, which is chill [unlike so and so]) [do not let your infants eat this shampoo, ladies and gentlemen].
 
-Let your fossil repository automatically push to GitHub, GitLab, Gitee, or any git remote on every commit, with fossil-native failure modes. Baby no cry, if dealing with git stresses you out just do everything perfectly and use this module, and no more tears. At-least, when you mess-up and have so spend painful 30minutes double and triple checking various CLI commands and args and their ever-loving flags; with full failure tracking via fossil tags. Fossil is chill about your failures, just logs-them into the fossil repository, lazily. If for some reason you don't want fossil to artifice your failures you can, before your next fossil commit, get your git situation figured-out, and then clean-up the disaster zone such that fossil is none-the wiser next time it is invoked.
+Let your fossil repository automatically push to GitLab, GitHub, Gitee, or any git remote on every commit, with fossil-native failure modes. Baby no cry, if dealing with git stresses you out just do everything perfectly and use this module, and no more tears. At least, when you mess up and have to spend a painful 30 minutes double and triple checking various CLI commands and args and their ever-loving flags; with full failure tracking via fossil tags. Fossil is chill about your failures, just logs them into the fossil repository, lazily. If for some reason you don't want fossil to artifice your failures you can, before your next fossil commit, get your git situation figured out, and then clean up the disaster zone such that fossil is none the wiser next time it is invoked.
 
 ## Why This Exists
 
-I love Fossil SCM's simplicity and power, but increasing my power level in a world that has a society requires talking to git, and aint happy about it.
-- GitHub/aliyun/GitLab/gitee etc. hosting
+I love Fossil SCM's simplicity and power, but increasing my power level in a world that has a society requires talking to git, and I ain't happy about it.
+- GitLab/GitHub/Aliyun/Gitee etc. hosting
 - CI/CD pipelines that only speak git
 - Collaboration with git-only teams
 - (Bonus!) Backup redundancy
 
 The problem: Existing solutions are brittle, stateful, or require manual intervention.
 
-The solution: To use fossil's own tag system as audit ledger. Every export and push is recorded as a fossil tag no external database, no state files, just clean, self-documenting history.
+The solution: Use fossil's own tag system as audit ledger. Every export and push is recorded as a fossil tag — no external database, no state files, just clean, self-documenting history.
 
 ## Features
 
@@ -43,8 +56,9 @@ fossilgitmirror (C binary)
 
 Audit tags (visible via `fossil tag list`):
 - `gitexport:a3f9c1...` — Export completed, git hash recorded
+- `gitpush:gitlab:ok:a3f9c1...` — Push to gitlab succeeded
 - `gitpush:github:ok:a3f9c1...` — Push to github succeeded
-- `gitpush:gitlab:fail:a3f9c1...` — Push to gitlab failed (fix + recommit retries)
+- `gitpush:gitee:fail:a3f9c1...` — Push to gitee failed (fix + recommit retries)
 
 ## Installation
 
@@ -75,15 +89,17 @@ Audit tags (visible via `fossil tag list`):
 3. Edit `remotes` config:
    ```bash
    # Example ~/.config/fossil-mirror/remotes
-   
+
    mirror  ~/projects/myproject-git-mirror
    fossil  ~/projects/myproject.fossil
-   
+
    # Compiler (uncomment for your platform):
    linux:   gcc -std=c99 -O2 -Wall -Wextra
    # mac:     clang -std=c99 -O2 -Wall -Wextra
-   
+
    # Git remotes (add as many as you need):
+   # GitLab is the native/primary remote for this project:
+   gitlab   git@gitlab.com:youruser/myproject.git
    github   git@github.com:youruser/myproject.git
    gitee    git@gitee.com:youruser/myproject.git
    ```
@@ -130,9 +146,9 @@ fossil tag list | grep git
 Example output:
 ```
 gitexport:a3f9c1d8...
+gitpush:gitlab:ok:a3f9c1d8...
 gitpush:github:ok:a3f9c1d8...
-gitpush:gitee:ok:a3f9c1d8...
-gitpush:gitlab:fail:a3f9c1d8...  ← needs attention
+gitpush:gitee:fail:a3f9c1d8...  ← needs attention
 ```
 
 ### Manual Sync
@@ -149,7 +165,7 @@ When a push fails (non-fast-forward, auth, network), you'll see:
 
 ```
 ┌─ PUSH FAILED ───────────────────────────────────────────────┐
-│ Remote: gitlab                                               │
+│ Remote: gitee                                                │
 │                                                              │
 │ This usually means:                                          │
 │   • Non-fast-forward (remote has commits you don't)          │
@@ -158,7 +174,7 @@ When a push fails (non-fast-forward, auth, network), you'll see:
 │                                                              │
 │ To fix:                                                      │
 │   1. Inspect: cd ~/projects/myproject-git-mirror             │
-│   2. Debug:   git push gitlab --all -v                       │
+│   2. Debug:   git push gitee --all -v                        │
 │   3. Resolve manually (fetch/merge/rebase as needed)         │
 │   4. Next fossil commit will retry automatically             │
 └──────────────────────────────────────────────────────────────┘
@@ -167,8 +183,8 @@ When a push fails (non-fast-forward, auth, network), you'll see:
 Fix it:
 ```bash
 cd ~/projects/myproject-git-mirror
-git fetch gitlab
-git merge gitlab/main  # or rebase, resolve conflicts
+git fetch gitee
+git merge gitee/main  # or rebase, resolve conflicts
 # Don't push manually! Just commit to fossil:
 cd ~/projects/myproject
 fossil commit -m "Merge upstream changes"
@@ -223,7 +239,7 @@ Remove the line from config. The remote stays in git but won't be pushed to anym
 To fully remove it from git:
 ```bash
 cd ~/projects/myproject-git-mirror
-git remote remove gitlab
+git remote remove gitee
 ```
 
 ## Troubleshooting
@@ -237,8 +253,10 @@ fossil hook list -R ~/projects/myproject.fossil
 
 Should show:
 ```
-after-receive: /home/user/.config/fossil-mirror/fossilgitmirror
+after-commit: /home/user/.config/fossil-mirror/fossilgitmirror
 ```
+
+> **Note:** Fossil uses `after-commit` hooks, not `after-receive` (that's a git hook name).
 
 ### "Compilation fails"
 
@@ -253,9 +271,12 @@ Update the compiler line in `remotes` if needed.
 ### "Push fails repeatedly"
 
 Common causes:
-1. SSH key not configured:
+
+1. SSH key not configured — test each remote:
    ```bash
-   ssh -T git@github.com
+   ssh -T git@gitlab.com   # GitLab (native)
+   ssh -T git@github.com   # GitHub
+   ssh -T gitee.com        # Gitee
    ```
 
 2. Remote diverged:
@@ -280,7 +301,7 @@ For huge repos (>10k commits), consider:
 
 ### "Git mirror out of sync"
 
-Nuclear option; just rebuild from scratch:
+Nuclear option — rebuild from scratch:
 
 ```bash
 rm -rf ~/projects/myproject-git-mirror
@@ -303,23 +324,34 @@ Modify `fossilgitinit.py` or create wrapper scripts.
 
 ### CI/CD Integration
 
-The git mirror is a normal git repo. Point your CI at it:
+The git mirror is a normal git repo. GitLab is the native CI target — point your pipeline at the mirror:
 
 ```yaml
-# .github/workflows/ci.yml in the FOSSIL repo
-# (not in git mirror)
+# .gitlab-ci.yml  (lives in the FOSSIL repo, CI reads from the git mirror)
+stages:
+  - test
+
+build-and-test:
+  stage: test
+  image: ubuntu:latest
+  script:
+    - make test
+```
+
+Because the fossil hook pushes to the GitLab remote on every commit, GitLab CI triggers automatically off the mirror. No manual push needed.
+
+For GitHub Actions on the GitHub mirror:
+
+```yaml
+# .github/workflows/ci.yml  (if you also want GitHub CI)
 on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          repository: youruser/myproject  # git mirror
+      - uses: actions/checkout@v4
       - run: make test
 ```
-
-The workflow lives in fossil, CI reads from the git mirror.
 
 ### Custom Hook Logic
 
@@ -339,7 +371,7 @@ gcc -std=c99 -O2 fossilgitmirror.c -o fossilgitmirror
 
 1. Remove hook:
    ```bash
-   fossil hook delete -R ~/projects/myproject.fossil after-receive
+   fossil hook delete -R ~/projects/myproject.fossil after-commit
    ```
 
 2. Delete files:
@@ -349,9 +381,8 @@ gcc -std=c99 -O2 fossilgitmirror.c -o fossilgitmirror
 
 3. Keep or delete git mirror:
    ```bash
-   # Keep it:
-   # (nothing to do, it's just a git repo now)
-   
+   # Keep it — it's just a git repo now, nothing special to do.
+
    # Delete it:
    rm -rf ~/projects/myproject-git-mirror
    ```
@@ -397,7 +428,7 @@ Built with:
 
 ## License
 
-Public domain BSD-3, made with code that is soley public domain: THANK YOU to [https://fossil-scm.org](fossil-scm.org), a key developer of SQLite!
+BSD 3-Clause. Built entirely from public-domain-friendly components — thank you to `[fossil-scm.org](https://fossil-scm.org)`, home of a key SQLite developer and one of the finest pieces of software engineering around.
 
 ## Contributing
 
@@ -405,9 +436,9 @@ This is a personal tool that solves a specific problem. If you find bugs or have
 
 1. Test them thoroughly
 2. Keep it simple
-3. Submit clear explanations, which respect the design decisions and impeccible taste, required, to develop no deps idempotent and idiomatic, small to-purpose repositories.
+3. Submit clear explanations that respect the design decisions and impeccable taste required to develop no-deps, idempotent, idiomatic, small-to-purpose repositories
 4. Or just fork and 'forgettaboutit'. ('I'm workin' here!')
 
 ---
 
-The goal is not full automation of everything. It's rock-solid, 'baby no cry' automation of the clean path, and clear systematization of the messy parts. If people behave maybe I'll make a 'baby no cry' button that doesn't; fix git pushing issues for you, it, makes git pushing issues no-longer a problem by reverting and undoing the failed commit and staging; re-fossilgitmirror the NEW state (which does include the errors from this failed state, currently in scope; so, delete that manually if you don't want error messages to fail forward and self-artifice).
+The goal is not full automation of everything. It's rock-solid, 'baby no cry' automation of the clean path, and clear systematization of the messy parts. If people behave, maybe I'll make a 'baby no cry' button that doesn't fix git pushing issues for you — it makes git pushing issues no longer a problem by reverting and undoing the failed commit and staging, re-running fossilgitmirror against the new state (which does include the errors from the failed state currently in scope; delete those manually if you don't want error messages to fail-forward and self-artifice).
