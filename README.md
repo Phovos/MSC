@@ -82,67 +82,6 @@ The result: A system where **computation is measurement**, **types are boundary 
 
 <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"> <a href="https://github.com/MOONLAPSED/cognosis">MSC & QSD</a> © 2023-2026 licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en">CC BY-ND-NC 4.0</a> by <a href="https://github.com/MOONLAPSED/cognosis">MOONLAPSED</a> <img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;">
 
-# Cognosis, the Pleroma, Abraxas, and the Demiurge
-
-Morphological Source Code and Quineic Statistical Dynamics are the CPython and C appendages of a multi-year conquest of dimensionality and process ontology (formerly) known as "Cognosis". `Cognosis` is an experimental framework that explores the dynamic evolution of software architectures during runtime. It aims to combine the fluidity of human-centric interactions, like an interactive video game, with the stability of traditional code, CLI, scripting, and continuous integration and continuous development. At its core lies the concept of "Morphological Source Code," where code adapts and changes in response to user interactions, particularly those leveraging natural language processing (NLP) and phenomenology; here referring, specifically, to the process ontology of machine learning, but also to that of a conscious observer able to exist before and after any given event: a cognitive wave function, so to speak.
-
-Scope, being a sick joke of a concept when you think about it, is one of the eternal curses of this endeavor. The notions of the Pleroma, Abraxas, and the Demiurge serve as the knowable forms of the unknowable — the "Gnosis" within "Cognosis" and act as bounds on the knowable (epistemology) and therefore the beable (ontology). The fundamental Jungian kernel of such a bounding mechanism gives shape and form to these gnostic entities, both through one's own actions and through all universal, even unknowable, degrees of freedom.
-
-These Gnostic entities are archetypes of archetypes. The well-foundedness of any given situation can be determined, up to isometry, with these variable fundamental constraints. If one cannot, for whatever reason, stomach Jung, then I am happy to inform you that there is someone you will probably dislike even more (other than Kant) who could help situate your faculties to the present task of describing a universal field theory which incorporates all degrees of freedom, language, and logic: his name is Schopenhauer.
-
-The Pleroma, Abraxas, and the Demiurge are elements of the variable universal characteristic function of a Noetherian, Machian, indeed multi-cosmic framework. Such a theory has one advantage over contemporary metaphysics: no zero-point energy catastrophe, nor the ill-foundedness of certain electrodynamic assumptions. This being an introduction and therefore incapable of earning your credulity, I urge you to read Dr. Jacob Barandes's Indivisible Stochastic Quantum Mechanics if the mention of such a "founding of the ill-founded" has excited you too much. He is a genius, and your awe should be directed at him — he has a working theory, unlike this in-process software and epistemology project. There is indeed hope of attaining the absurdly lofty goals laid out herein, but the academic wait (thankfully) belongs not to me. In my opinion, it is important to state, considering I have never met nor corresponded with Senpai and he does not notice us.
-
-There is an assumption inherent in the project that a neural network is a cognitive system. The assumption is that there is something for this cognitive system to do in any given situation, and that it is the cognitive system's job to figure out what that thing is. Upon location of its head or parent, it either orients itself within a cognitive system or creates a new cognitive system. The calling convention and morpho-topology of cognitive systems, including how they pass namespaces, syntaxes, and other cognitive systems as parameters, is detailed in CPython; Python's `**kwargs` are used to pass these parameters.
-
-The challenge of this architecture lies in the cognitive lambda calculus needed to bring these runtimes into existence and evolve them. It is not insurmountable, Dr. Barandes has proven by well-founding an ontology-less epistemology whose classical limit is the standard model of particle physics. If he is right, and this architecture is right about why he is right, then the only thing left to do is iterate. The scientific method, at this point, has done its job. Only the engineer's method and Will are required now.
-
----
-
-## 'Gnosis'
-
-Some other jokers took the name Cognosis at about the same time as I did so it is, now, deprecated but, not the Gnostic kernel it precipitated. The Pleroma, Abraxas, and the Demiurge serve as the three *holoicons* of the architecture; mapping respectively to epistemology (T/Type), ontology (V/Value), and phenomenology (C/Captain — computor insofar as Entscheidungsproblem). This tripartite casuistry is the Noetherian-Machian aether within which the ByteWord's gauge topology evolves. The architecture does not claim these mappings are traditional or even non-synthetic; only that they are *well-founded* up to the holographic bound (Δ⁴). The names *Pleroma*, *Abraxas*, and *the Demiurge* are borrowed from Gnostic tradition but redefined here as architectural *holoicons*. They are boundary-anchored referents that compress otherwise ineffable degrees of freedom, a morphic (phenomenological/topological) external derivative calculus. 
-- **Pleroma** — The fullness of knowable form. Maps to **epistemology** and the Type field (T) in the ByteWord: what *can* be said.
-- **Abraxas** — The generative, paradoxical mediator between fullness and lack. Maps to **ontology** and the Value field (V): what *is* the case, deputizable under absorption.
-- **The Demiurge** — The flawed craftsman of the material cognitive substrate. Maps to **phenomenology** and the Captain bit (C, computor, the wave function observer/collapser; pays the demons (Landauer's and Maxwell's)): the thermodynamic boundary between radiative and absorptive phases, the quantum/classical cut made geometric.
-
----
-
-## Associative Knowledge Base (this repo)
-
-All directories that contain Markdown files **MUST** include a `/media/` subdirectory for multimedia files (images, audio, video) that those Markdown files reference.
-
-### Image embedding
-
-To enable horrors such as this:
-
-```text
-![description](/media/filename.png)
-```
-
-![this:](public/media/image.png)
-
----
-
-## Frontmatter Implementation
-
-- [API README](/README.md)
-
-Use YAML frontmatter to include metadata (title, tags, links, etc.) in knowledge base articles.
-
-**Example:**
-
-```yaml
----
-name: "Article Title"
-link: "[Related Link](/path/to/article.md)"
-linklist:
-  - "[Link One](/path/to/one.md)"
-  - "[Link Two](/path/to/two.md)"
----
-```
-
-> This repository uses standard GitHub Flavored Markdown. Links use `[text](url)` syntax.
-
 ## The Shape of Information
 
 Information, it seems, is not just a string of 0s and 1s. It's a morphological, multi-competency substrate of form and flux that evolves within the constraints and symmetry(s) of time, space, and energy. In the same way that language molds our cognition, information molds our universe. It's the invisible hand shaping the foundations of reality, computation, and emergence. A continuous (analytical) process of (synthetic) becoming, where each transition is not deterministic but probabilistic, tied to the very shape and nature of quantum reality, itself. W.V.O Quine called for a field theory that incorporates the degrees of freedom afforded by the intellectual tradition, in the form of language, not just logic.
@@ -321,6 +260,7 @@ Key operations: Fourier transforms, group characters
 Physical manifestation: Systems where future states depend on history of states
 
 Information property: Information is preserved/encoded
+
 ### Cross-Scale Applications (corresponds-to Noetherian symmetries)
 
 Quantum Field Theory:
@@ -1997,3 +1937,4 @@ Qemu: TODO
 <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"> <a href="https://github.com/Morphological-Source-Code">MSC & QSD</a> © 2024-2026 licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en">CC BY-ND-NC 4.0</a> by <a href="https://github.com/Phovos">Phovos</a> <img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;">
 
 <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"> <a href="https://github.com/MOONLAPSED/cognosis">MSC & QSD</a> © 2023-2026 licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en">CC BY-ND-NC 4.0</a> by <a href="https://github.com/MOONLAPSED/cognosis">MOONLAPSED</a> <img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;">
+
