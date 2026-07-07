@@ -516,6 +516,167 @@ class PlatformFactory:
         else:
             return PlatformInterface()
 
+try:
+    if platform.system() == "Windows":
+        from ctypes import windll, byref, wintypes
+
+        # from ctypes.wintypes import HANDLE, DWORD, LPWSTR, LPVOID, BOOL
+        from pathlib import PureWindowsPath
+
+        class WindowsConsole:
+            """Enable ANSI escape sequences on Windows consoles."""
+
+            @staticmethod
+            def enable_ansi() -> None:
+                STD_OUTPUT_HANDLE = -11
+                ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
+                kernel32 = windll.kernel32
+                handle = kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+                mode = wintypes.DWORD()
+                if kernel32.GetConsoleMode(handle, byref(mode)):
+                    new_mode = mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING
+                    kernel32.SetConsoleMode(handle, new_mode)
+                else:
+                    raise RuntimeError("Failed to get console mode for enabling ANSI.")
+
+        try:
+            WindowsConsole.enable_ansi()
+        except Exception as e:
+            print(
+                f"Failed to enable ANSI escape codes on Windows console: {e}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+except (ImportError, OSError, RuntimeError) as e:
+    # If enabling ANSI fails (e.g., not a real console), print a warning
+    # but don't exit. The program can run, just without colors.
+    print(
+        f"Warning: Failed to enable ANSI escape codes on Windows: {e}", file=sys.stderr
+    )
+
+
+@dataclass
+class LogAdapter:
+    """
+    Sets up console + file + broadcast + (optional) queue handlers, and exposes a correlation-aware logger instance. You can customize handler levels and output filenames at instantiation time.
+    ---
+    | Token             | Meaning                                      |
+    | ----------------- | -------------------------------------------- |
+    | `%(asctime)s`     | Timestamp                                    |
+    | `%(name)s`        | Logger name (`__name__`)                     |
+    | `%(levelname)s`   | Log level name                               |
+    | `%(message)s`     | The actual message                           |
+    | `%(filename)s`    | File name where the log is emitted           |
+    | `%(lineno)d`      | Line number of the log statement             |
+    | `%(funcName)s`    | Function name                                |
+    | `%(threadName)s`  | Thread name (super useful w/ `threading`)    |
+    | `%(processName)s` | Process name (helpful for `multiprocessing`) |
+    ---
+
+    """
+
+    console_level: str = "INFO"
+    file_filename: str = "app.log"
+    file_level: str = "INFO"
+    broadcast_filename: str = "broadcast.log"
+    broadcast_level: str = "INFO"
+    queue_size: Optional[int] = (
+        None  # Set to -1 for infinite, or a positive int for a sized queue
+    )
+    correlation_id: str = "SYSTEM"
+    LOGGING_CONFIG: dict = field(init=False)
+    logger: logging.Logger = field(init=False)
+
+    def __post_init__(self):
+        self.LOGGING_CONFIG = {
+            'version': 1,
+            'disable_existing_loggers': False,
+            'formatters': {
+                'default': {
+                    'format': '[%(levelname)s] %(asctime)s | [%(filename)s:%(lineno)d]: %(message)s',
+                    'datefmt': '%Y-%m-%d %H:%M:%S',
+                },
+                'color': {
+                    '()': self.ColorFormatter,
+                    'format': '[%(levelname)s] %(asctime)s | [%(filename)s:%(lineno)d]: %(message)s',
+                    'datefmt': '%Y-%m-%d %H:%M:%S',
+                },
+            },
+            'handlers': {
+                'console': {
+                    'class': 'logging.StreamHandler',
+                    'level': self.console_level,
+                    'formatter': 'color',
+                    'stream': 'ext://sys.stdout',
+                },
+                'file': {
+                    'class': 'logging.handlers.RotatingFileHandler',
+                    'level': self.file_level,
+                    'formatter': 'default',
+                    'filename': self.file_filename,
+                    'maxBytes': 10 * 1024 * 1024,
+                    'backupCount': 5,
+                    'encoding': 'utf-8',
+                },
+                'broadcast': {
+                    'class': 'logging.handlers.RotatingFileHandler',
+                    'level': self.broadcast_level,
+                    'formatter': 'default',
+                    'filename': self.broadcast_filename,
+                    'maxBytes': 10 * 1024 * 1024,
+                    'backupCount': 5,
+                    'encoding': 'utf-8',
+                },
+            },
+            'root': {
+                'level': 'INFO',
+                # This will be determined by whether a queue is used or not
+                'handlers': [],
+            },
+        }
+        # The list of handlers that do the actual work (writing to console/file)
+        destination_handlers = ['console', 'file', 'broadcast']
+        if self.queue_size is not None:
+            # If a queue is used, configure it and make it the ONLY handler for the root logger.
+            # The QueueHandler itself will then dispatch to the destination handlers.
+            self.LOGGING_CONFIG['handlers']['queue'] = {
+                'class': 'logging.handlers.QueueHandler',
+                # This is the crucial missing piece:
+                'handlers': destination_handlers,
+                'queue': multiprocessing.Queue(self.queue_size),
+            }
+            self.LOGGING_CONFIG['root']['handlers'] = ['queue']
+        else:
+            # If no queue is used, the root logger sends directly to the destination handlers.
+            self.LOGGING_CONFIG['root']['handlers'] = destination_handlers
+
+        logging.config.dictConfig(self.LOGGING_CONFIG)
+        base_logger = logging.getLogger(__name__)
+        self.logger = self.CorrelationLogger(base_logger, {"cid": self.correlation_id})
+
+        self.logger.info("Logger initialized.")
+
+    class CorrelationLogger(logging.LoggerAdapter):
+        def process(self, msg: str, kwargs: Any) -> tuple[str, Any]:
+            cid = self.extra.get("cid", "SYSTEM")
+            return f"[{cid}] {msg}", kwargs
+
+    class ColorFormatter(logging.Formatter):
+        _COLORS = {
+            logging.DEBUG: "\033[34m",  # Blue
+            logging.INFO: "\033[32m",  # Green
+            logging.WARNING: "\033[33m",  # Yellow
+            logging.ERROR: "\033[31m",  # Red
+            logging.CRITICAL: "\033[41m",  # Red background
+        }
+        _RESET = "\033[0m"
+
+        def format(self, record: logging.LogRecord) -> str:
+            base = super().format(record)
+            color = self._COLORS.get(record.levelno, self._COLORS[logging.DEBUG])
+            return f"{color}{base}{self._RESET}"
+
+
 T = TypeVar('T')
 V = TypeVar('V')
 C = TypeVar('C')
@@ -640,6 +801,170 @@ def elevate(data: Any, cls: Type) -> object:
     kwargs = {k: getattr(data, k, data.get(k)) for k in source.__annotations__}
     return cls(**kwargs)
 
+def reduce(
+    function: Callable[[Any, T], Any], iterable: Iterable[T], initializer: Any = None
+) -> Any:
+    """A custom reduce implementation that supports early termination with Reduced."""
+    accum_value = initializer if initializer is not None else function()
+    for x in iterable:
+        accum_value = function(accum_value, x)
+        if isinstance(accum_value, Reduced):
+            return accum_value.val
+    return accum_value
+
+
+# Base Transducer Class
+class Transducer(ABC):
+    """Base class for defining transducers."""
+
+    @abstractmethod
+    def __call__(self, step: Callable[[Any, T], Any]) -> Callable[[Any, T], Any]:
+        """The transducer's __call__ method allows it to be used as a decorator."""
+        pass
+
+
+class Map(Transducer):
+    """Transducer for mapping elements with a function."""
+
+    def __init__(self, f: Callable[[T], Any]):
+        self.f = f
+
+    def __call__(self, step: Callable[[Any, T], Any]) -> Callable[[Any, T], Any]:
+        def new_step(r, x):
+            return step(r, self.f(x))
+
+        return new_step
+
+
+class Filter(Transducer):
+    """Transducer for filtering elements based on a predicate."""
+
+    def __init__(self, pred: Callable[[T], bool]):
+        self.pred = pred
+
+    def __call__(self, step: Callable[[Any, T], Any]) -> Callable[[Any, T], Any]:
+        def new_step(r, x):
+            return step(r, x) if self.pred(x) else r
+
+        return new_step
+
+
+class Cat(Transducer):
+    """Transducer for flattening nested collections."""
+
+    def __call__(self, step: Callable[[Any, T], Any]) -> Callable[[Any, T], Any]:
+        def new_step(r, x):
+            if not hasattr(x, '__iter__'):
+                raise TypeError(f"Expected iterable, got {type(x)} with value {x}")
+            result = r
+            for item in x:
+                result = step(result, item)
+                if isinstance(result, Reduced):
+                    return result
+            return result
+
+        return new_step
+
+
+# Utility Functions for Transducers
+def compose(*fns: Callable[[Any], Any]) -> Callable[[Any], Any]:
+    """Compose functions in reverse order."""
+    return reduce(lambda f, g: lambda x: f(g(x)), reversed(fns))
+
+
+def transduce(
+    xform: Transducer, f: Callable[[Any, T], Any], start: Any, coll: Iterable[T]
+) -> Any:
+    """Apply a transducer to a collection with an initial value."""
+    reducer = xform(f)
+    return reduce(reducer, coll, start)
+
+
+def mapcat(f: Callable[[T], Iterable[Any]]) -> Transducer:
+    """Map then flatten results into one collection."""
+    return compose(Map(f), Cat())
+
+
+def into(target: Union[list, set], xducer: Transducer, coll: Iterable[T]) -> Any:
+    """Apply transducer and collect results into a target container."""
+
+    def append(r, x):
+        if hasattr(r, 'append'):
+            r.append(x)
+        elif hasattr(r, 'add'):
+            r.add(x)
+        return r
+
+    return transduce(xducer, append, target, coll)
+
+
+# Mapper Function for Transforming Input Data
+def mapper(mapping_description: Dict[str, Any], input_data: Dict[str, Any]):
+    def transform(xform, value):
+        if callable(xform):
+            return xform(value)
+        elif isinstance(xform, dict):
+            return {k: transform(v, value) for k, v in xform.items()}
+        else:
+            raise ValueError(
+                f"Invalid transformation type: {type(xform)}. Expected callable or Mapping."
+            )
+
+    def get_value(key):
+        if isinstance(key, str) and key.startswith(":"):
+            return input_data.get(key[1:])
+        return input_data.get(key)
+
+    def process_mapping(mapping_description):
+        result = {}
+        for key, xform in mapping_description.items():
+            if isinstance(xform, str):
+                value = get_value(xform)
+                result[key] = value
+            elif isinstance(xform, dict):
+                if "key" in xform:
+                    value = get_value(xform["key"])
+                    if "xform" in xform:
+                        result[key] = transform(xform["xform"], value)
+                    elif "xf" in xform:
+                        if isinstance(value, list):
+                            transformed = [xform["xf"](v) for v in value]
+                            if "f" in xform:
+                                result[key] = xform["f"](transformed)
+                            else:
+                                result[key] = transformed
+                        else:
+                            result[key] = xform["xf"](value)
+                    else:
+                        result[key] = value
+                else:
+                    result[key] = process_mapping(xform)
+            else:
+                result[key] = xform
+        return result
+
+    return process_mapping(mapping_description)
+
+
+# Helper Function for Formatting Complex Matrices
+def format_complex_matrix(matrix: List[List[complex]], precision: int = 3) -> str:
+    """Helper function to format complex matrices for printing."""
+    result = []
+    for row in matrix:
+        formatted_row = []
+        for elem in row:
+            if not isinstance(elem, complex):
+                raise ValueError(f"Expected complex number, got {type(elem)}.")
+            real = round(elem.real, precision)
+            imag = round(elem.imag, precision)
+            if abs(imag) < 1e-10:
+                formatted_row.append(f"{real:6.3f}")
+            else:
+                formatted_row.append(
+                    f"{real:6.3f}{'+' if imag >= 0 else ''}{imag:6.3f}j"
+                )
+        result.append("[" + ", ".join(formatted_row) + "]")
+    return "[\n " + "\n ".join(result) + "\n]"
 
 class TorusWinding:
     NULL = 0b00  # (0,0) - topological glue
@@ -1283,6 +1608,39 @@ def aluTest():
 
 
 if __name__ == "__main__":
+    import argparse
+    import re
+
+    def is_valid_semver(version: str) -> bool:
+        # Accepts optional leading 'v', e.g. "v1.2.3" or "1.2.3"
+        return re.match(r"^v?\d+\.\d+\.\d+$", version) is not None
+
+    parser = argparse.ArgumentParser(description="Run MSC with specified version.")
+    parser.add_argument(
+        "--version",
+        help="The semantic version to use (e.g. 0.0.12 or v0.0.12)",
+        required=True,
+    )
+    args = parser.parse_args()
+    version = args.version
+
+    if version.startswith("v"):
+        version = version[1:]
+
+    if not is_valid_semver(version):
+        print(f"Invalid semantic version format: {version}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"[INFO] Using version: {version}")
+
+    log = LogAdapter(correlation_id=version)
+    log.logger.debug("Debug level test; 'Hello world!'")
+    log.logger.warning("Warning with CID and colors")
+    log.logger.error("Error occurred in something")
+    log.logger.critical("Critical issue reported")
+    print(f'Find logs @ {log.broadcast_filename}')
+
+
     mc = MorphicComplex(1, 2)
     print(mc, mc.conjugate(), mc * mc)
     bw = ByteWord(0b10110010)
@@ -1303,4 +1661,4 @@ if __name__ == "__main__":
     print("C library loaded:", bool(plat.load_c_library()))
     print("Memory info sample:", plat.get_memory_info())
 
-aluTest()
+    aluTest()
